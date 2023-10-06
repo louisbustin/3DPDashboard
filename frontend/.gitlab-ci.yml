@@ -29,6 +29,8 @@ deploy-frontend:
       - main
   dependencies:
     - "build-frontend"
+  before_script:
+    - cd frontend
   script:
     - echo "Deploying container to s3"
     - aws s3 sync build/ s3://$AWS_S3_BUCKET_NAME/main/latest
