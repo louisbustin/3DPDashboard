@@ -11,6 +11,8 @@ build-frontend:       # This job runs in the build stage, which runs first.
       - build/
     exclude:
       - "node_modules/**/*"
+  before_script:
+    - cd frontend
   script:
     - echo "Compiling the code..."
     - npm install
