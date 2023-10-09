@@ -1,27 +1,31 @@
 import React from "react";
-import logo from "./logo.svg";
 import "./App.css";
-import LoginButton from "./components/buttons/LoginButton";
-import LogoutButton from "./components/buttons/LogoutButton";
+import CssBaseline from "@mui/material/CssBaseline";
 import { Outlet } from "react-router-dom";
-import { useAuth0 } from "@auth0/auth0-react";
+import Header from "./components/Header";
+import Footer from "./components/Footer";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
+import { useDarkMode } from "usehooks-ts";
 
 function App() {
-  const { user } = useAuth0();
-  console.log(user);
+  const { isDarkMode } = useDarkMode();
+
+  const theme = createTheme({
+    palette: {
+      mode: isDarkMode ? "dark" : "light",
+    },
+  });
+
   return (
     <>
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <LoginButton></LoginButton>
-          <LogoutButton />
-        </header>
-        <main>
+      <CssBaseline />
+      <ThemeProvider theme={theme}>
+        <Header />
+        <div>
           <Outlet />
-        </main>
-        <footer>Footer here</footer>
-      </div>
+        </div>
+        <Footer />
+      </ThemeProvider>
     </>
   );
 }
