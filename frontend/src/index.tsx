@@ -7,13 +7,21 @@ import reportWebVitals from "./reportWebVitals";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Profile from "./Profile";
 import ErrorPage from "./ErrorPage";
+import { AuthenticationGuard } from "./components/AuthenticationGuard";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
     errorElement: <ErrorPage />,
-    children: [{ path: "profile", element: <Profile /> }],
+    children: [
+      {
+        path: "profile",
+        element: (
+          <AuthenticationGuard component={Profile}></AuthenticationGuard>
+        ),
+      },
+    ],
   },
 ]);
 
