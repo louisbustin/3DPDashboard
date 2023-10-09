@@ -1,15 +1,45 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import React from "react";
+import ReactDOM from "react-dom/client";
+import "./index.css";
+import App from "./App";
+import { Auth0Provider } from "@auth0/auth0-react";
+import reportWebVitals from "./reportWebVitals";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import Profile from "./Profile";
+import ErrorPage from "./ErrorPage";
+import { AuthenticationGuard } from "./components/AuthenticationGuard";
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <App />,
+    errorElement: <ErrorPage />,
+    children: [
+      {
+        path: "profile",
+        element: (
+          <AuthenticationGuard component={Profile}></AuthenticationGuard>
+        ),
+      },
+    ],
+  },
+]);
 
 const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
+  document.getElementById("root") as HTMLElement
 );
+
 root.render(
   <React.StrictMode>
-    <App />
+    <Auth0Provider
+      domain="eforge.us.auth0.com"
+      clientId="LXfZEH7bDbnOShzJrGNxERdtUyWyjpzc"
+      authorizationParams={{
+        redirect_uri: window.location.origin,
+      }}
+    >
+      <RouterProvider router={router} />
+    </Auth0Provider>
   </React.StrictMode>
 );
 
