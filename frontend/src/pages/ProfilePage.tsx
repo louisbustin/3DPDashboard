@@ -1,14 +1,13 @@
 import React from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 
-const Profile = () => {
-  const { user, isAuthenticated, isLoading, error } = useAuth0();
+const ProfilePage = () => {
+  const { user, isAuthenticated, isLoading } = useAuth0();
 
   if (isLoading) {
     return <div>Loading ...</div>;
   }
 
-  console.log(user, isAuthenticated, isLoading, error);
   return (
     <div>
       User profile information
@@ -23,4 +22,4 @@ const Profile = () => {
   );
 };
 
-export default Profile;
+export default ProfilePage;
