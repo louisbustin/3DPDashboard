@@ -5,8 +5,14 @@ import App from "./App";
 import { Auth0Provider } from "@auth0/auth0-react";
 import reportWebVitals from "./reportWebVitals";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import Profile from "./Profile";
+import ProfilePage from "./pages/ProfilePage";
 import ErrorPage from "./ErrorPage";
+import PrinterPage from "./pages/PrinterPage";
+import FilamentPage from "./pages/FilamentPage";
+import TermsPage from "./pages/TermsPage";
+import PrivacyPage from "./pages/PrivacyPage";
+import ContactPage from "./pages/ContactPage";
+import HomePage from "./pages/HomePage";
 import { AuthenticationGuard } from "./components/AuthenticationGuard";
 
 import "@fontsource/roboto/300.css";
@@ -21,9 +27,37 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage />,
     children: [
       {
+        path: "",
+        element: <HomePage />,
+      },
+      {
         path: "profile",
         element: (
-          <AuthenticationGuard component={Profile}></AuthenticationGuard>
+          <AuthenticationGuard component={ProfilePage}></AuthenticationGuard>
+        ),
+      },
+      {
+        path: "terms",
+        element: <TermsPage />,
+      },
+      {
+        path: "privacy",
+        element: <PrivacyPage />,
+      },
+      {
+        path: "contact",
+        element: <ContactPage />,
+      },
+      {
+        path: "filament",
+        element: (
+          <AuthenticationGuard component={FilamentPage}></AuthenticationGuard>
+        ),
+      },
+      {
+        path: "printers",
+        element: (
+          <AuthenticationGuard component={PrinterPage}></AuthenticationGuard>
         ),
       },
     ],
