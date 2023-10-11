@@ -1,6 +1,6 @@
 
 build-backend:       # This job runs in the build stage, which runs first.
-  image: python:3.8
+  image: public.ecr.aws/sam/build-nodejs18.x
   stage: build
   only:
     changes:
@@ -13,8 +13,6 @@ build-backend:       # This job runs in the build stage, which runs first.
       - "node_modules/**/*"
   before_script:
     - cd backend
-    - pip3 install awscli --upgrade
-    - pip3 install aws-sam-cli --upgrade
   script:
     - echo "Compiling the code..."
     - sam build
@@ -22,7 +20,7 @@ build-backend:       # This job runs in the build stage, which runs first.
 
 deploy-backend:
   stage: deploy
-  image: python:3.8
+  image: public.ecr.aws/sam/build-nodejs18.x
   only:
     changes:
       - backend/**/*
@@ -32,10 +30,8 @@ deploy-backend:
     - "build-backend"
   before_script:
     - cd backend
-    - pip3 install awscli --upgrade
-    - pip3 install aws-sam-cli --upgrade
   script:
     - echo "Deploying container to s3"
-    - sam deploy
+    - sam deploy --no-confirm-changeset --no-fail-on-empty-changeset
     - echo "Deploy done for container"
 
