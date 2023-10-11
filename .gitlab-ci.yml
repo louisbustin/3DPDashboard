@@ -5,3 +5,4 @@ stages:          # List of stages for jobs, and their order of execution
   - deploy
 include: 
   - "frontend/.gitlab-ci.yml"
+  - "backend/.gitlab-ci.yml"

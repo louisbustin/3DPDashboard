@@ -1,0 +1,37 @@
+
+build-backend:       # This job runs in the build stage, which runs first.
+  image: registry.gitlab.com/gitlab-org/cloud-deploy/aws-base:latest
+  stage: build
+  only:
+    changes:
+      - backend/**/*
+  artifacts:
+    untracked: true
+    paths:
+      - ./
+    exclude:
+      - "node_modules/**/*"
+  before_script:
+    - cd backend
+  script:
+    - echo "Compiling the code..."
+    - aws cloudformation package --template-file ./template.yaml --s3-bucket 3dpdashboard --output-template-file deployment.yml 
+    - echo "Compile complete."
+
+deploy-backend:
+  stage: deploy
+  image: registry.gitlab.com/gitlab-org/cloud-deploy/aws-base:latest
+  only:
+    changes:
+      - backend/**/*
+    refs:
+      - main
+  dependencies:
+    - "build-backend"
+  before_script:
+    - cd backend
+  script:
+    - echo "Deploying container to s3"
+    - aws cloudformation deploy --template-file deployment.yml --stack-name stack3dpdashboard
+    - echo "Deploy done for container"
+

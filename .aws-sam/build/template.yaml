@@ -1,0 +1,52 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: 'backend
+
+  Sample SAM Template for backend
+
+  '
+Globals:
+  Function:
+    Timeout: 3
+Resources:
+  FilamentGET:
+    Type: AWS::Serverless::Function
+    Properties:
+      PackageType: Image
+      Architectures:
+      - x86_64
+      Events:
+        HelloWorld:
+          Type: Api
+          Properties:
+            Path: /filament
+            Method: get
+      ImageUri: filamentget:nodejs18.x-v1
+    Metadata:
+      DockerContext: /home/louis/dev/eforge-websites/3DPDashboard/backend/filament/GET
+      DockerTag: nodejs18.x-v1
+      Dockerfile: Dockerfile
+      SamResourceId: FilamentGET
+  FilamentPOST:
+    Type: AWS::Serverless::Function
+    Properties:
+      PackageType: Image
+      Architectures:
+      - x86_64
+      Events:
+        HelloWorld:
+          Type: Api
+          Properties:
+            Path: /filament
+            Method: post
+      ImageUri: filamentpost:nodejs18.x-v1
+    Metadata:
+      DockerContext: /home/louis/dev/eforge-websites/3DPDashboard/backend/filament/POST
+      DockerTag: nodejs18.x-v1
+      Dockerfile: Dockerfile
+      SamResourceId: FilamentPOST
+Outputs:
+  FilamentApi:
+    Description: API Gateway endpoint URL for Prod stage for Filament functions
+    Value:
+      Fn::Sub: https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/filament/
