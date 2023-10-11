@@ -1,6 +1,6 @@
 
 build-backend:       # This job runs in the build stage, which runs first.
-  image: public.ecr.aws/sam/build-nodejs18.x
+  image: public.ecr.aws/sam/build-nodejs18.x:latest
   stage: build
   only:
     changes:
@@ -20,7 +20,7 @@ build-backend:       # This job runs in the build stage, which runs first.
 
 deploy-backend:
   stage: deploy
-  image: public.ecr.aws/sam/build-nodejs18.x
+  image: public.ecr.aws/sam/build-nodejs18.x:latest
   only:
     changes:
       - backend/**/*

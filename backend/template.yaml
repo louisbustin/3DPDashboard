@@ -12,36 +12,31 @@ Globals:
 
 Resources:
   FilamentGET:
-    Type: AWS::Serverless::Function
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      PackageType: Image
+      CodeUri: filament/GET/
+      Handler: app.lambdaHandler
+      Runtime: nodejs18.x
       Architectures:
         - x86_64
       Events:
         HelloWorld:
-          Type: Api
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
             Path: /filament
             Method: get
-    Metadata:
-      DockerTag: nodejs18.x-v1
-      DockerContext: ./filament/GET
-      Dockerfile: Dockerfile
   FilamentPOST:
     Type: AWS::Serverless::Function
     Properties:
-      PackageType: Image
+      CodeUri: filament/POST/
+      Handler: app.lambdaHandler
+      Runtime: nodejs18.x
       Architectures:
         - x86_64
       Events:
         HelloWorld:
-          Type: Api
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
             Path: /filament
             Method: post
-    Metadata:
-      DockerTag: nodejs18.x-v1
-      DockerContext: ./filament/POST
-      Dockerfile: Dockerfile
-
 
