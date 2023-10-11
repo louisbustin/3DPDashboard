@@ -15,8 +15,6 @@ build-backend:       # This job runs in the build stage, which runs first.
     - cd backend
   script:
     - echo "Compiling the code..."
-    - echo $AWS_S3_BUCKET_NAME
-    - aws sts get-caller-identity
     - aws cloudformation package --template-file ./template.yaml --s3-bucket 3dpdashboard --output-template-file deployment.yml 
     - echo "Compile complete."
 
@@ -34,7 +32,6 @@ deploy-backend:
     - cd backend
   script:
     - echo "Deploying container to s3"
-    - aws s3 sync build/ s3://$AWS_S3_BUCKET_NAME/main/latest
-    - aws cloudfront create-invalidation --distribution-id $AWS_DISTRIBUTION_ID --paths "/main/latest/index.html"
+    - aws cloudformation deploy --template-file deployment.yml --stack-name stack3dpdashboard
     - echo "Deploy done for container"
 
