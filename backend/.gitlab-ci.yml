@@ -1,6 +1,6 @@
 image: node:latest
 
-build-frontend:       # This job runs in the build stage, which runs first.
+build-backend:       # This job runs in the build stage, which runs first.
   stage: build
   only:
     changes:
