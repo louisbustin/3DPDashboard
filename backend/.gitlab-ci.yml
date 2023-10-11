@@ -1,6 +1,6 @@
 
 build-backend:       # This job runs in the build stage, which runs first.
-  image: registry.gitlab.com/gitlab-org/cloud-deploy/aws-base:latest
+  image: python:3.8
   stage: build
   only:
     changes:
@@ -13,6 +13,7 @@ build-backend:       # This job runs in the build stage, which runs first.
       - "node_modules/**/*"
   before_script:
     - cd backend
+    - pip3 install awscli --upgrade
     - pip3 install aws-sam-cli --upgrade
   script:
     - echo "Compiling the code..."
@@ -21,7 +22,7 @@ build-backend:       # This job runs in the build stage, which runs first.
 
 deploy-backend:
   stage: deploy
-  image: registry.gitlab.com/gitlab-org/cloud-deploy/aws-base:latest
+  image: python:3.8
   only:
     changes:
       - backend/**/*
@@ -31,6 +32,7 @@ deploy-backend:
     - "build-backend"
   before_script:
     - cd backend
+    - pip3 install awscli --upgrade
     - pip3 install aws-sam-cli --upgrade
   script:
     - echo "Deploying container to s3"
