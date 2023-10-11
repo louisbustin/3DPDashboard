@@ -17,7 +17,8 @@ capabilities = "CAPABILITY_IAM"
 confirm_changeset = true
 resolve_s3 = true
 resolve_image_repos = true
-s3_prefix = "backend"
+s3_bucket = "3dpdashboard"
+s3_prefix = "backend3dpDashboard"
 region = "us-east-1"
 
 [default.package.parameters]
