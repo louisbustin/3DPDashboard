@@ -7,7 +7,8 @@
   "author": "eForge.us",
   "license": "MIT",
   "dependencies": {
-    "axios": ">=0.21.1"
+    "axios": ">=0.21.1",
+    "uuid": "^9.0.1"
   },
   "scripts": {
     "test": "mocha tests/unit/"

@@ -31,9 +31,9 @@
       },
       "api": {
         "path": "/filament",
-        "httpMethod": "get",
+        "httpMethod": "post",
         "payload": {
-          "json": {}
+          "json": { "id": 1, "name": "Polymaker" }
         }
       },
       "lambda": {
