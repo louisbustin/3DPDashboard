@@ -7,6 +7,7 @@ const tableName = "3dpdashboard_filament";
 
 export const lambdaHandler = async (event, context) => {
   try {
+    console.log(event);
     const requestJSON = JSON.parse(event.body);
     const itemId = requestJSON.id || uuidv4();
 
