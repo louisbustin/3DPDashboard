@@ -7,11 +7,18 @@ const EditDrawer = (
   props: PropsWithChildren<{
     open: boolean;
     onClose?: () => void;
+    onSave?: () => void;
     hideSaveButton?: boolean;
     hideDeleteButton?: boolean;
     hideCancelButton?: boolean;
   }>
 ) => {
+  const onFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (props.onSave) {
+      props.onSave();
+    }
+  };
   return (
     <Drawer anchor="right" open={props.open} onClose={props.onClose}>
       <Box display="flex" justifyContent="flex-end" alignItems="flex-end">
@@ -20,7 +27,11 @@ const EditDrawer = (
         </Button>
       </Box>
       <Divider light />
-      <Box component="form" sx={{ m: 1, width: "35ch" }}>
+      <Box
+        component="form"
+        sx={{ m: 1, width: "35ch" }}
+        onSubmit={onFormSubmit}
+      >
         <Grid container spacing={2}>
           <Grid item xs={12} marginTop={1}>
             {props.children}
@@ -31,7 +42,7 @@ const EditDrawer = (
               {!props.hideCancelButton && (
                 <Button onClick={props.onClose}>Cancel</Button>
               )}
-              {!props.hideSaveButton && <SaveButton />}
+              {!props.hideSaveButton && <SaveButton type="submit" />}
             </Stack>
           </Grid>
         </Grid>

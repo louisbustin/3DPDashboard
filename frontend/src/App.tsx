@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import "./App.css";
 import CssBaseline from "@mui/material/CssBaseline";
 import { Outlet } from "react-router-dom";
@@ -8,19 +7,11 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { useDarkMode } from "usehooks-ts";
 import { Container } from "@mui/material";
 import { SWRConfig } from "swr";
-import { useAuth0 } from "@auth0/auth0-react";
-import { useEffectOnce } from "usehooks-ts";
+import useBearerToken from "./hooks/use-bearer-token";
 
 function App() {
   const { isDarkMode } = useDarkMode();
-  const [bearerToken, setBearerToken] = useState("");
-  const auth0 = useAuth0();
-  useEffectOnce(() => {
-    const getToken = async () => {
-      setBearerToken(await auth0.getAccessTokenSilently());
-    };
-    getToken();
-  });
+  const bearerToken = useBearerToken();
 
   const theme = createTheme({
     palette: {
@@ -29,7 +20,7 @@ function App() {
   });
 
   const swrConfig = {
-    refreshInterval: 30000,
+    refreshInterval: 300000,
     fetcher: async (resource: RequestInfo, init: RequestInit | undefined) => {
       return fetch(resource, {
         ...init,

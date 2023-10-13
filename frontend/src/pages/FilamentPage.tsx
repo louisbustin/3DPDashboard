@@ -6,28 +6,47 @@ import { Button, Stack } from "@mui/material";
 import EditFilamentDrawer from "../components/drawers/EditFilamentDrawer";
 
 const columns: GridColDef<IFilament>[] = [
-  { field: "id", headerName: "ID", width: 100 },
-  { field: "brand", headerName: "Brand", width: 130 },
-  { field: "name", headerName: "Name", width: 130 },
-  { field: "type", headerName: "Type", width: 130 },
+  { field: "id", headerName: "ID", flex: 1 },
+  { field: "brand", headerName: "Brand", flex: 1 },
+  { field: "name", headerName: "Name", flex: 1 },
+  { field: "type", headerName: "Type", flex: 1 },
 ];
 const apiURL = `${process.env.REACT_APP_API_BASE_URL}filament`;
 
 const FilamentPage = () => {
-  const { data } = useSWR<IFilament[]>(apiURL);
+  const { data, mutate } = useSWR<IFilament[]>(apiURL);
   const [selectedRowId, setSelectedRowId] = useState("");
+  const [addAddEditrowId, setAddEditrowId] = useState("");
   const [drawerOpen, setDrawerOpen] = useState(false);
+
+  const openDrawer = (from: "add" | "edit") => {
+    if (from === "add") {
+      setAddEditrowId("");
+    } else {
+      setAddEditrowId(selectedRowId);
+    }
+    setDrawerOpen(true);
+  };
 
   return (
     <>
       <EditFilamentDrawer
         open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
+        onClose={() => {
+          mutate();
+          setDrawerOpen(false);
+        }}
+        filamentId={addAddEditrowId}
       />
       <h2>Filaments</h2>
       <Stack direction="row" spacing={0.5} justifyContent="flex-end">
-        <Button onClick={() => setDrawerOpen(true)}>Add</Button>
-        <Button disabled={selectedRowId === ""}>Edit</Button>
+        <Button onClick={() => openDrawer("add")}>Add</Button>
+        <Button
+          disabled={selectedRowId === ""}
+          onClick={() => openDrawer("edit")}
+        >
+          Edit
+        </Button>
         <Button disabled={selectedRowId === ""}>Delete</Button>
       </Stack>
 

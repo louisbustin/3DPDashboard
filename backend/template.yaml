@@ -54,8 +54,54 @@ Resources:
       Events:
         Filament:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
-          Properties:
+          Properties: 
             Path: /filament
             Method: options
-
-
+  FilamentByIdGET:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: filament/byid/GET
+      Handler: app.lambdaHandler
+      Runtime: nodejs18.x
+      Architectures:
+        - x86_64
+      Policies:
+      - AmazonDynamoDBFullAccess
+      Events:
+        Filament:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /filament/{id}
+            Method: get
+  FilamentByIdOPTIONS:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: filament/byid/OPTIONS
+      Handler: app.lambdaHandler
+      Runtime: nodejs18.x
+      Architectures:
+        - x86_64
+      Policies:
+      - AmazonDynamoDBFullAccess
+      Events:
+        Filament:
+          Type: Api 
+          Properties:
+            Path: /filament/{id}
+            Method: options
+  FilamentByIdDELETE:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: filament/byid/DELETE
+      Handler: app.lambdaHandler
+      Runtime: nodejs18.x
+      Architectures:
+        - x86_64
+      Policies:
+      - AmazonDynamoDBFullAccess
+      Events:
+        Filament:
+          Type: Api 
+          Properties:
+            Path: /filament/{id}
+            Method: delete

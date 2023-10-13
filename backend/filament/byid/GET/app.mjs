@@ -21,11 +21,12 @@ export const lambdaHandler = async (event, context) => {
     const user = await getUserInfo(event.headers.Authorization);
     const command = new QueryCommand({
       TableName: "3dpdashboard_filament",
-      IndexName: "usersub-index",
-      KeyConditionExpression: "usersub = :usersub",
+      KeyConditionExpression: "id = :id",
       ExpressionAttributeValues: {
         ":usersub": user.sub,
+        ":id": event.pathParameters.id,
       },
+      FilterExpression: "usersub = :usersub",
     });
 
     const response = await dynamo.send(command);
@@ -37,7 +38,7 @@ export const lambdaHandler = async (event, context) => {
       headers: {
         "Access-Control-Allow-Origin": "*",
       },
-      body: JSON.stringify(response.Items),
+      body: JSON.stringify(response.Items[0]),
     };
   } catch (err) {
     console.log(err);
