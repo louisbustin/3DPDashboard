@@ -19,6 +19,7 @@ import "@fontsource/roboto/300.css";
 import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
+import ResinPage from "./pages/ResinPage";
 
 const router = createBrowserRouter([
   {
@@ -52,6 +53,12 @@ const router = createBrowserRouter([
         path: "filament",
         element: (
           <AuthenticationGuard component={FilamentPage}></AuthenticationGuard>
+        ),
+      },
+      {
+        path: "resin",
+        element: (
+          <AuthenticationGuard component={ResinPage}></AuthenticationGuard>
         ),
       },
       {

@@ -25,6 +25,9 @@ export const lambdaHandler = async (event, context) => {
 
     return {
       statusCode: requestJSON.id ? 200 : 201,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
       body: JSON.stringify({
         message: requestJSON.id ? "updated" : "created",
         id: itemId,

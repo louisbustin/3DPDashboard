@@ -6,12 +6,27 @@ import PrivacyTipIcon from "@mui/icons-material/PrivacyTip";
 import ContactPageIcon from "@mui/icons-material/ContactPage";
 import StickyNote2Icon from "@mui/icons-material/StickyNote2";
 import Paper from "@mui/material/Paper";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const Footer = () => {
-  const [activeTabNumber, setActiveTabNumber] = useState(0);
   const navigate = useNavigate();
+  const loc = useLocation();
+
+  let activeTab = -1;
+  switch (loc.pathname) {
+    case "/":
+      activeTab = 0;
+      break;
+    case "/contact":
+      activeTab = 1;
+      break;
+    case "/terms":
+      activeTab = 2;
+      break;
+    case "/privacy":
+      activeTab = 3;
+      break;
+  }
 
   return (
     <>
@@ -21,9 +36,8 @@ const Footer = () => {
       >
         <BottomNavigation
           showLabels
-          value={activeTabNumber}
+          value={activeTab}
           onChange={(event, newValue) => {
-            setActiveTabNumber(newValue);
             switch (newValue) {
               case 0:
                 navigate("/");
