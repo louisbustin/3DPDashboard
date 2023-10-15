@@ -1,9 +1,11 @@
 import { PropsWithChildren, useEffect, useState } from "react";
 import EditDrawer from "./EditDrawer";
 import TextField from "@mui/material/TextField";
-import { Alert, AlertTitle, Stack } from "@mui/material";
+import { Stack } from "@mui/material";
 import IFilament from "../../models/IFilament";
 import useBearerToken from "../../hooks/use-bearer-token";
+import LoadingDialog from "../LoadingDialog";
+import MessageBanner from "../MessageBanner";
 
 const apiURL = `${process.env.REACT_APP_API_BASE_URL}filament`;
 
@@ -14,6 +16,7 @@ const EditFilamentDrawer = (
     filamentId?: string;
   }>
 ) => {
+  const [isLoading, setIsLoading] = useState(false);
   const [filament, setFilament] = useState<IFilament>({
     id: props.filamentId || "",
   });
@@ -23,6 +26,7 @@ const EditFilamentDrawer = (
   const bearerToken = useBearerToken();
   useEffect(() => {
     const getFilament = async () => {
+      setIsLoading(true);
       if (props.filamentId) {
         const response = await fetch(apiURL + "/" + props.filamentId, {
           method: "GET",
@@ -36,6 +40,9 @@ const EditFilamentDrawer = (
           id: props.filamentId || "",
         });
       }
+      setIsLoading(false);
+      // Click on the text field when done loading
+      document.getElementById("brand")?.focus();
     };
     getFilament();
   }, [props.filamentId, bearerToken]);
@@ -56,7 +63,15 @@ const EditFilamentDrawer = (
     });
   };
 
+  const handleClose = () => {
+    if (props.onClose) props.onClose();
+    //clear out any saved filaments when we close the dialog
+    setFilament({
+      id: props.filamentId || "",
+    });
+  };
   const saveFilament = async () => {
+    setIsLoading(true);
     const response = await fetch(apiURL, {
       method: "POST",
       body: JSON.stringify(filament),
@@ -64,32 +79,30 @@ const EditFilamentDrawer = (
     });
     if (response.ok) {
       setSuccessMessage("Filament created successfully.");
-      if (props.onClose) props.onClose();
+      handleClose();
       setTimeout(() => setSuccessMessage(""), 5000);
     } else {
       setErrorMessage(`Creation failed with message: ${response.statusText}`);
     }
+    setIsLoading(false);
   };
 
   return (
     <>
-      {successMessage && (
-        <Alert severity="success" onClose={() => setSuccessMessage("")}>
-          <AlertTitle>Success</AlertTitle>
-          {successMessage}
-        </Alert>
-      )}
-      {errorMessage && (
-        <Alert severity="error" onClose={() => setErrorMessage("")}>
-          <AlertTitle>Error</AlertTitle>
-          {errorMessage}
-        </Alert>
-      )}
+      <LoadingDialog open={isLoading} />
+      <MessageBanner
+        successMessage={successMessage}
+        errorMessage={errorMessage}
+        onClose={() => {
+          setErrorMessage("");
+          setSuccessMessage("");
+        }}
+      />
       <EditDrawer
         open={props.open}
-        onClose={props.onClose}
+        onClose={handleClose}
         onSave={saveFilament}
-        hideDeleteButton={!props.filamentId}
+        hideDeleteButton={true}
       >
         <Stack spacing={2}>
           <h2>{props.filamentId ? "Edit " : "New "}Filament</h2>

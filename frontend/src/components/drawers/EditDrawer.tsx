@@ -2,6 +2,8 @@ import { Box, Button, Drawer, Grid, Stack, Divider } from "@mui/material";
 import { PropsWithChildren } from "react";
 import SaveButton from "../buttons/SaveButton";
 import CloseIcon from "@mui/icons-material/Close";
+import CancelButton from "../buttons/CancelButton";
+import DeleteButton from "../buttons/DeleteButton";
 
 const EditDrawer = (
   props: PropsWithChildren<{
@@ -37,10 +39,10 @@ const EditDrawer = (
             {props.children}
           </Grid>
           <Grid item xs={12}>
-            <Stack direction="row">
-              {!props.hideDeleteButton && <Button>Delete</Button>}
+            <Stack direction="row" spacing={1} justifyContent={"flex-end"}>
+              {!props.hideDeleteButton && <DeleteButton></DeleteButton>}
               {!props.hideCancelButton && (
-                <Button onClick={props.onClose}>Cancel</Button>
+                <CancelButton onClick={props.onClose}>Cancel</CancelButton>
               )}
               {!props.hideSaveButton && <SaveButton type="submit" />}
             </Stack>
