@@ -1,5 +1,9 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, QueryCommand } from "@aws-sdk/lib-dynamodb";
+import {
+  QueryCommand,
+  DeleteCommand,
+  DynamoDBDocumentClient,
+} from "@aws-sdk/lib-dynamodb";
 
 const getUserInfo = async (authToken) => {
   const response = await fetch("https://eforge.us.auth0.com/userinfo", {
@@ -18,26 +22,42 @@ const tableName = "3dpdashboard_filament";
 
 export const lambdaHandler = async (event, context) => {
   try {
+    //first, we must verify this filament is owned by this user
     const user = await getUserInfo(event.headers.Authorization);
-    const command = new QueryCommand({
+    const queryCommand = new QueryCommand({
       TableName: "3dpdashboard_filament",
-      IndexName: "usersub-index",
-      KeyConditionExpression: "usersub = :usersub",
+      KeyConditionExpression: "id = :id",
       ExpressionAttributeValues: {
         ":usersub": user.sub,
+        ":id": event.pathParameters.id,
+      },
+      FilterExpression: "usersub = :usersub",
+    });
+
+    const res = await dynamo.send(queryCommand);
+    if (res && res.Items && res.Items.length < 1) {
+      return {
+        statusCode: 404,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+        },
+      };
+    }
+
+    const command = new DeleteCommand({
+      TableName: "3dpdashboard_filament",
+      Key: {
+        id: event.pathParameters.id,
       },
     });
 
     const response = await dynamo.send(command);
 
-    //remove the usersub from going over the wire to the client
-    response.Items.forEach((i) => delete i.usersub);
     return {
-      statusCode: 200,
+      statusCode: 204,
       headers: {
         "Access-Control-Allow-Origin": "*",
       },
-      body: JSON.stringify(response.Items),
     };
   } catch (err) {
     console.log(err);

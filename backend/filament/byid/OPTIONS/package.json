@@ -7,14 +7,6 @@
   "author": "eForge.us",
   "license": "MIT",
   "dependencies": {
-    "axios": ">=0.21.1",
-    "uuid": "^9.0.1"
-  },
-  "scripts": {
-    "test": "mocha tests/unit/"
-  },
-  "devDependencies": {
-    "chai": "^4.3.6",
-    "mocha": "^10.1.0"
+    "axios": ">=0.21.1"
   }
 }

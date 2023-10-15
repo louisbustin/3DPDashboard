@@ -16,6 +16,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 
 const pages = [
   { name: "Filament", link: "/filament" },
+  { name: "Resin", link: "/resin" },
   { name: "Printers", link: "/printers" },
 ];
 
@@ -111,8 +112,6 @@ const Header = () => {
             <Typography
               variant="h5"
               noWrap
-              component="a"
-              href="#app-bar-with-responsive-menu"
               sx={{
                 mr: 2,
                 display: { xs: "flex", md: "none" },
@@ -124,7 +123,12 @@ const Header = () => {
                 textDecoration: "none",
               }}
             >
-              3DP
+              <NavLink
+                to="/"
+                style={{ color: "inherit", textDecoration: "none" }}
+              >
+                3DP
+              </NavLink>
             </Typography>
             <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
               {!isLoading &&

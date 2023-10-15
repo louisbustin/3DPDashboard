@@ -3,6 +3,20 @@
     {
       "type": "aws-sam",
       "request": "direct-invoke",
+      "name": "backend:FilamentByIdOPTIONS",
+      "invokeTarget": {
+        "target": "template",
+        "templatePath": "${workspaceFolder}/backend/template.yaml",
+        "logicalId": "FilamentByIdOPTIONS"
+      },
+      "lambda": {
+        "payload": {},
+        "environmentVariables": {}
+      }
+    },
+    {
+      "type": "aws-sam",
+      "request": "direct-invoke",
       "name": "API backend:FilamentGET (nodejs18.x)",
       "invokeTarget": {
         "target": "api",
@@ -31,9 +45,12 @@
       },
       "api": {
         "path": "/filament",
-        "httpMethod": "get",
+        "httpMethod": "post",
         "payload": {
-          "json": {}
+          "json": {
+            "id": 1,
+            "name": "Polymaker"
+          }
         }
       },
       "lambda": {
