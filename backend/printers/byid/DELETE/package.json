@@ -1,0 +1,12 @@
+{
+  "name": "printers",
+  "version": "1.0.0",
+  "description": "Printers endpoints",
+  "main": "app.js",
+  "repository": "",
+  "author": "eForge.us",
+  "license": "MIT",
+  "dependencies": {
+    "axios": ">=0.21.1"
+  }
+}

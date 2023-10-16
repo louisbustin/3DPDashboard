@@ -1,85 +1,85 @@
 import { PropsWithChildren, useEffect, useState } from "react";
 import EditDrawer from "./EditDrawer";
 import { Stack } from "@mui/material";
-import IFilament from "../../models/IFilament";
+import IPrinter from "../../models/IPrinter";
 import useBearerToken from "../../hooks/use-bearer-token";
 import LoadingDialog from "../LoadingDialog";
 import MessageBanner from "../MessageBanner";
 import ShrunkTextField from "../formelements/ShrunkTextField";
 
-const apiURL = `${process.env.REACT_APP_API_BASE_URL}filament`;
+const apiURL = `${process.env.REACT_APP_API_BASE_URL}printers`;
 
-const EditFilamentDrawer = (
+const EditPrinterDrawer = (
   props: PropsWithChildren<{
     open: boolean;
     onClose?: (updateOccurred?: boolean) => void;
-    filamentId?: string;
+    printerId?: string;
   }>
 ) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [filament, setFilament] = useState<IFilament>({
-    id: props.filamentId || "",
+  const [printer, setPrinter] = useState<IPrinter>({
+    id: props.printerId || "",
   });
 
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const bearerToken = useBearerToken();
+
   useEffect(() => {
-    const getFilament = async () => {
+    const getPrinter = async () => {
       setIsLoading(true);
-      if (props.filamentId) {
-        const response = await fetch(apiURL + "/" + props.filamentId, {
+      if (props.printerId) {
+        const response = await fetch(apiURL + "/" + props.printerId, {
           method: "GET",
           headers: { Authorization: `Bearer ${bearerToken}` },
         });
         if (response.ok) {
-          setFilament(await response.json());
+          setPrinter(await response.json());
         }
       } else {
-        setFilament({
-          id: props.filamentId || "",
+        setPrinter({
+          id: props.printerId || "",
         });
       }
-
       setIsLoading(false);
       // Click on the text field when done loading
       document.getElementById("brand")?.focus();
     };
-    getFilament();
-  }, [props.filamentId, bearerToken]);
+    getPrinter();
+  }, [props.printerId, bearerToken]);
 
   const onChangeBrand = (brand: string) => {
-    setFilament((f) => {
+    setPrinter((f) => {
       return { ...f, brand };
     });
   };
   const onChangeName = (name: string) => {
-    setFilament((f) => {
+    setPrinter((f) => {
       return { ...f, name };
     });
   };
   const onChangeType = (type: string) => {
-    setFilament((f) => {
+    setPrinter((f) => {
       return { ...f, type };
     });
   };
 
   const handleClose = (updateOccurred: boolean) => {
     if (props.onClose) props.onClose(updateOccurred);
-    //clear out any saved filaments when we close the dialog
-    setFilament({
-      id: props.filamentId || "",
+    //clear out any saved printers when we close the dialog
+    setPrinter({
+      id: props.printerId || "",
     });
   };
-  const saveFilament = async () => {
+  const savePrinter = async () => {
     setIsLoading(true);
     const response = await fetch(apiURL, {
       method: "POST",
-      body: JSON.stringify(filament),
+      body: JSON.stringify(printer),
       headers: { Authorization: `Bearer ${bearerToken}` },
     });
     if (response.ok) {
-      setSuccessMessage("Filament created successfully.");
+      setSuccessMessage("Printer created successfully.");
       handleClose(true);
       setTimeout(() => setSuccessMessage(""), 5000);
     } else {
@@ -102,28 +102,28 @@ const EditFilamentDrawer = (
       <EditDrawer
         open={props.open}
         onClose={() => handleClose(false)}
-        onSave={saveFilament}
+        onSave={savePrinter}
         hideDeleteButton={true}
       >
         <Stack spacing={2}>
-          <h2>{props.filamentId ? "Edit " : "New "}Filament</h2>
+          <h2>{props.printerId ? "Edit " : "New "}Printer</h2>
           <ShrunkTextField
             required
             id="brand"
             label="Brand"
-            value={filament.brand}
+            value={printer.brand}
             onChange={(e) => onChangeBrand(e.target.value)}
           />
           <ShrunkTextField
             id="name"
             label="Name"
-            value={filament.name}
+            value={printer.name}
             onChange={(e) => onChangeName(e.target.value)}
           />
           <ShrunkTextField
             id="type"
             label="Type"
-            value={filament.type}
+            value={printer.type}
             onChange={(e) => onChangeType(e.target.value)}
           />
         </Stack>
@@ -132,4 +132,4 @@ const EditFilamentDrawer = (
   );
 };
 
-export default EditFilamentDrawer;
+export default EditPrinterDrawer;
