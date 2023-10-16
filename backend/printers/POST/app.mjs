@@ -8,7 +8,7 @@ const dynamo = DynamoDBDocumentClient.from(client, {
     removeUndefinedValues: false,
   },
 });
-const tableName = "3dpdashboard_filament";
+const tableName = "3dpdashboard_printers";
 
 const getUserInfo = async (authToken) => {
   const response = await fetch("https://eforge.us.auth0.com/userinfo", {

@@ -66,9 +66,13 @@ const FilamentPage = () => {
       ></MessageBanner>
       <EditFilamentDrawer
         open={drawerOpen}
-        onClose={() => {
-          mutate();
+        onClose={async (updateOccurred) => {
+          if (updateOccurred) {
+            setShowLoadingDialog(true);
+            await mutate();
+          }
           setDrawerOpen(false);
+          setShowLoadingDialog(false);
         }}
         filamentId={addAddEditrowId}
       />

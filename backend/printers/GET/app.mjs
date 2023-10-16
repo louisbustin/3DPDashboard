@@ -1,14 +1,5 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { PutCommand, DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
-import { v4 as uuidv4 } from "uuid";
-
-const client = new DynamoDBClient({});
-const dynamo = DynamoDBDocumentClient.from(client, {
-  marshallOptions: {
-    removeUndefinedValues: false,
-  },
-});
-const tableName = "3dpdashboard_filament";
+import { DynamoDBDocumentClient, QueryCommand } from "@aws-sdk/lib-dynamodb";
 
 const getUserInfo = async (authToken) => {
   const response = await fetch("https://eforge.us.auth0.com/userinfo", {
@@ -21,33 +12,32 @@ const getUserInfo = async (authToken) => {
   }
 };
 
+const client = new DynamoDBClient({});
+const dynamo = DynamoDBDocumentClient.from(client);
+const tableName = "3dpdashboard_printers";
+
 export const lambdaHandler = async (event, context) => {
   try {
     const user = await getUserInfo(event.headers.Authorization);
+    const command = new QueryCommand({
+      TableName: tableName,
+      IndexName: "usersub-index",
+      KeyConditionExpression: "usersub = :usersub",
+      ExpressionAttributeValues: {
+        ":usersub": user.sub,
+      },
+    });
 
-    const requestJSON = JSON.parse(event.body);
-    const itemId = requestJSON.id || uuidv4();
+    const response = await dynamo.send(command);
 
-    await dynamo.send(
-      new PutCommand({
-        TableName: tableName,
-        Item: {
-          ...requestJSON,
-          id: itemId,
-          usersub: user.sub,
-        },
-      })
-    );
-
+    //remove the usersub from going over the wire to the client
+    response.Items.forEach((i) => delete i.usersub);
     return {
-      statusCode: requestJSON.id ? 200 : 201,
+      statusCode: 200,
       headers: {
         "Access-Control-Allow-Origin": "*",
       },
-      body: JSON.stringify({
-        message: requestJSON.id ? "updated" : "created",
-        id: itemId,
-      }),
+      body: JSON.stringify(response.Items),
     };
   } catch (err) {
     console.log(err);
