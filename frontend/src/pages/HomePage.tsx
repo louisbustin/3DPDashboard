@@ -1,7 +1,15 @@
+import { useAuth0 } from "@auth0/auth0-react";
+import LoadingDialog from "../components/LoadingDialog";
+import HomePageNoAuth from "../components/HomePageNoAuth";
+import HomePageDashboard from "../components/HomePageDashboard";
+
 const HomePage = () => {
+  const { isAuthenticated, isLoading } = useAuth0();
   return (
     <>
-      <h2>HomePage</h2>
+      <LoadingDialog open={isLoading} />
+      {!isLoading && isAuthenticated && <HomePageDashboard />}
+      {!isLoading && !isAuthenticated && <HomePageNoAuth />}
     </>
   );
 };
