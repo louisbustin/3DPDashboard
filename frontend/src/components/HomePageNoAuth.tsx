@@ -37,6 +37,7 @@ const HomePageNoAuth = () => {
               width={200}
               height={200}
               style={{ marginLeft: 5, paddingRight: 5 }}
+              alt="3D Printer"
             />
           </Stack>
         </Box>
