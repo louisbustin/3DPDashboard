@@ -1,7 +1,7 @@
 import { PropsWithChildren, useEffect, useState } from "react";
 import EditDrawer from "./EditDrawer";
 import { Stack } from "@mui/material";
-import IPrinter from "../../models/IPrinter";
+import IPrinter, { getDefaultPrinter } from "../../models/IPrinter";
 import useBearerToken from "../../hooks/use-bearer-token";
 import LoadingDialog from "../LoadingDialog";
 import MessageBanner from "../MessageBanner";
@@ -17,9 +17,7 @@ const EditPrinterDrawer = (
   }>
 ) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [printer, setPrinter] = useState<IPrinter>({
-    id: props.printerId || "",
-  });
+  const [printer, setPrinter] = useState<IPrinter>(getDefaultPrinter());
 
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
@@ -37,9 +35,7 @@ const EditPrinterDrawer = (
           setPrinter(await response.json());
         }
       } else {
-        setPrinter({
-          id: props.printerId || "",
-        });
+        setPrinter(getDefaultPrinter());
       }
       setIsLoading(false);
       // Click on the text field when done loading
@@ -67,9 +63,7 @@ const EditPrinterDrawer = (
   const handleClose = (updateOccurred: boolean) => {
     if (props.onClose) props.onClose(updateOccurred);
     //clear out any saved printers when we close the dialog
-    setPrinter({
-      id: props.printerId || "",
-    });
+    setPrinter(getDefaultPrinter());
   };
   const savePrinter = async () => {
     setIsLoading(true);
