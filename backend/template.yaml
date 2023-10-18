@@ -203,3 +203,35 @@ Resources:
           Properties:
             Path: /printers/{id}
             Method: delete
+  DashboardGET:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dashboard/GET
+      Handler: app.lambdaHandler
+      Runtime: nodejs18.x
+      Architectures:
+        - x86_64
+      Policies:
+      - AmazonDynamoDBFullAccess
+      Events:
+        Printers:
+          Type: Api
+          Properties:
+            Path: /dashboard
+            Method: get
+  DashboardOPTIONS:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dashboard/OPTIONS
+      Handler: app.lambdaHandler
+      Runtime: nodejs18.x
+      Architectures:
+        - x86_64
+      Policies:
+      - AmazonDynamoDBFullAccess
+      Events:
+        Printers:
+          Type: Api 
+          Properties:
+            Path: /dashboard
+            Method: options            

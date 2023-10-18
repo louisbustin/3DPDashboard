@@ -12,19 +12,19 @@ const MessageBanner = (
   return (
     <>
       {props.successMessage && (
-        <Alert severity="success" onClose={props.onClose}>
+        <Alert severity="success" onClose={props.onClose} sx={{ marginTop: 3 }}>
           <AlertTitle>Success</AlertTitle>
           {props.successMessage}
         </Alert>
       )}
       {props.errorMessage && (
-        <Alert severity="error" onClose={props.onClose}>
+        <Alert severity="error" onClose={props.onClose} sx={{ marginTop: 3 }}>
           <AlertTitle>Error</AlertTitle>
           {props.errorMessage}
         </Alert>
       )}
       {props.errorMessage && (
-        <Alert severity="info" onClose={props.onClose}>
+        <Alert severity="info" onClose={props.onClose} sx={{ marginTop: 3 }}>
           <AlertTitle>Info</AlertTitle>
           {props.infoMessage}
         </Alert>

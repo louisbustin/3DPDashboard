@@ -1,7 +1,7 @@
 import { PropsWithChildren, useEffect, useState } from "react";
 import EditDrawer from "./EditDrawer";
 import { Stack } from "@mui/material";
-import IFilament from "../../models/IFilament";
+import IFilament, { getDefaultFilament } from "../../models/IFilament";
 import useBearerToken from "../../hooks/use-bearer-token";
 import LoadingDialog from "../LoadingDialog";
 import MessageBanner from "../MessageBanner";
@@ -17,9 +17,7 @@ const EditFilamentDrawer = (
   }>
 ) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [filament, setFilament] = useState<IFilament>({
-    id: props.filamentId || "",
-  });
+  const [filament, setFilament] = useState<IFilament>(getDefaultFilament());
 
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
@@ -36,9 +34,7 @@ const EditFilamentDrawer = (
           setFilament(await response.json());
         }
       } else {
-        setFilament({
-          id: props.filamentId || "",
-        });
+        setFilament(getDefaultFilament());
       }
 
       setIsLoading(false);
@@ -67,9 +63,7 @@ const EditFilamentDrawer = (
   const handleClose = (updateOccurred: boolean) => {
     if (props.onClose) props.onClose(updateOccurred);
     //clear out any saved filaments when we close the dialog
-    setFilament({
-      id: props.filamentId || "",
-    });
+    setFilament(getDefaultFilament());
   };
   const saveFilament = async () => {
     setIsLoading(true);

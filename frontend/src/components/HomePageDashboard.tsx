@@ -1,7 +1,43 @@
+import { Grid } from "@mui/material";
+import SummaryCard from "./SummaryCard";
+import filamentImage from "../images/filamentspools.png";
+import printerImage from "../images/3dprinter.png";
+import printImage from "../images/3dprint.png";
+import useSWR from "swr";
+import IDashboard from "../models/IDashboard";
+
+const apiURL = `${process.env.REACT_APP_API_BASE_URL}dashboard`;
+
 const HomePageDashboard = () => {
+  const { data } = useSWR<IDashboard>(apiURL);
   return (
     <>
-      <h2>Home page Dashboard</h2>
+      <h2>Welcome to your dashboard!</h2>
+      <Grid container spacing={3} justifyContent="center">
+        <Grid item xs={12} md={4}>
+          <SummaryCard
+            title="Current spools"
+            total={data?.filamentCount}
+            icon={filamentImage}
+            link="/filament"
+          ></SummaryCard>
+        </Grid>
+        <Grid item xs={12} md={4}>
+          <SummaryCard
+            title="Printers"
+            total={data?.printerCount}
+            icon={printerImage}
+            link="/printers"
+          ></SummaryCard>
+        </Grid>
+        <Grid item xs={12} md={4}>
+          <SummaryCard
+            title="Active Prints"
+            total={data?.printCount}
+            icon={printImage}
+          ></SummaryCard>
+        </Grid>
+      </Grid>
     </>
   );
 };
