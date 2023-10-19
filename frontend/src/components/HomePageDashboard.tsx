@@ -17,7 +17,7 @@ const HomePageDashboard = () => {
         <Grid item xs={12} md={4}>
           <SummaryCard
             title="Current spools"
-            total={data?.filamentCount}
+            total={data?.filamentCount || 0}
             icon={filamentImage}
             link="/filament"
           ></SummaryCard>
@@ -25,7 +25,7 @@ const HomePageDashboard = () => {
         <Grid item xs={12} md={4}>
           <SummaryCard
             title="Printers"
-            total={data?.printerCount}
+            total={data?.printerCount || 0}
             icon={printerImage}
             link="/printers"
           ></SummaryCard>
@@ -33,7 +33,7 @@ const HomePageDashboard = () => {
         <Grid item xs={12} md={4}>
           <SummaryCard
             title="Active Prints"
-            total={data?.printCount}
+            total={data?.printCount || 0}
             icon={printImage}
           ></SummaryCard>
         </Grid>
