@@ -31,7 +31,10 @@ const EditFilamentDrawer = (
           headers: { Authorization: `Bearer ${bearerToken}` },
         });
         if (response.ok) {
-          setFilament(await response.json());
+          //make sure fields are default, not a null
+          const filament = await response.json();
+          const defaultFilament = getDefaultFilament();
+          setFilament({ ...defaultFilament, ...filament });
         }
       } else {
         setFilament(getDefaultFilament());
@@ -60,6 +63,31 @@ const EditFilamentDrawer = (
     });
   };
 
+  const onChangeTotalWeight = (totalWeight: string) => {
+    setFilament((f) => {
+      return { ...f, totalWeight: Number(totalWeight) };
+    });
+  };
+  const onChangeLowTemp = (lowTemp: string) => {
+    setFilament((f) => {
+      return { ...f, lowTemp: Number(lowTemp) };
+    });
+  };
+  const onChangeHighTemp = (highTemp: string) => {
+    setFilament((f) => {
+      return { ...f, highTemp: Number(highTemp) };
+    });
+  };
+  const onChangeLowBedTemp = (lowBedTemp: string) => {
+    setFilament((f) => {
+      return { ...f, lowBedTemp: Number(lowBedTemp) };
+    });
+  };
+  const onChangeHighBedTemp = (highBedTemp: string) => {
+    setFilament((f) => {
+      return { ...f, highBedTemp: Number(highBedTemp) };
+    });
+  };
   const handleClose = (updateOccurred: boolean) => {
     if (props.onClose) props.onClose(updateOccurred);
     //clear out any saved filaments when we close the dialog
@@ -119,6 +147,41 @@ const EditFilamentDrawer = (
             label="Type"
             value={filament.type}
             onChange={(e) => onChangeType(e.target.value)}
+          />
+          <ShrunkTextField
+            id="weight"
+            label="Total Weight"
+            value={filament.totalWeight}
+            onChange={(e) => onChangeTotalWeight(e.target.value)}
+            type="number"
+          />
+          <ShrunkTextField
+            id="lowTemp"
+            label="Lower Print Temp"
+            value={filament.lowTemp}
+            onChange={(e) => onChangeLowTemp(e.target.value)}
+            type="number"
+          />
+          <ShrunkTextField
+            id="highTemp"
+            label="High Print Temp"
+            value={filament.highTemp}
+            onChange={(e) => onChangeHighTemp(e.target.value)}
+            type="number"
+          />
+          <ShrunkTextField
+            id="lowBedTemp"
+            label="Low Bed Temp"
+            value={filament.lowBedTemp}
+            onChange={(e) => onChangeLowBedTemp(e.target.value)}
+            type="number"
+          />
+          <ShrunkTextField
+            id="highBedTemp"
+            label="High Bed Temp"
+            value={filament.highBedTemp}
+            onChange={(e) => onChangeHighBedTemp(e.target.value)}
+            type="number"
           />
         </Stack>
       </EditDrawer>
