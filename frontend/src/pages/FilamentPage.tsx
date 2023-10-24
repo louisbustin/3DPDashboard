@@ -14,6 +14,7 @@ const columns: GridColDef<IFilament>[] = [
   { field: "brand", headerName: "Brand", flex: 1 },
   { field: "name", headerName: "Name", flex: 1 },
   { field: "type", headerName: "Type", flex: 1 },
+  { field: "color", headerName: "Color", flex: 1 },
 ];
 const apiURL = `${process.env.REACT_APP_API_BASE_URL}filament`;
 
