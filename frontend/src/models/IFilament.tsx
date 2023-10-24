@@ -9,6 +9,7 @@ export default interface IFilament {
   highTemp: number;
   lowBedTemp: number;
   highBedTemp: number;
+  color: string;
 }
 
 export const getDefaultFilament = (): IFilament => {
@@ -23,5 +24,6 @@ export const getDefaultFilament = (): IFilament => {
     highTemp: 0,
     lowBedTemp: 0,
     highBedTemp: 0,
+    color: "",
   };
 };

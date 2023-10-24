@@ -88,6 +88,11 @@ const EditFilamentDrawer = (
       return { ...f, highBedTemp: Number(highBedTemp) };
     });
   };
+  const onChangeColor = (color: string) => {
+    setFilament((f) => {
+      return { ...f, color };
+    });
+  };
   const handleClose = (updateOccurred: boolean) => {
     if (props.onClose) props.onClose(updateOccurred);
     //clear out any saved filaments when we close the dialog
@@ -143,11 +148,17 @@ const EditFilamentDrawer = (
             onChange={(e) => onChangeName(e.target.value)}
           />
           <ShrunkTextField
+            id="color"
+            label="Color"
+            value={filament.color}
+            onChange={(e) => onChangeColor(e.target.value)}
+          />
+          <ShrunkTextField
             id="type"
             label="Type"
             value={filament.type}
             onChange={(e) => onChangeType(e.target.value)}
-          />
+          />{" "}
           <ShrunkTextField
             id="weight"
             label="Total Weight"
