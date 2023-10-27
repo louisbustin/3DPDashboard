@@ -1,43 +1,40 @@
 import useSWR from "swr";
 import IFilament from "../models/IFilament";
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { DataGrid, GridActionsCellItem, GridColDef } from "@mui/x-data-grid";
 import { useState } from "react";
-import { Button, Stack } from "@mui/material";
+import { Button, Stack, Tooltip } from "@mui/material";
 import EditFilamentDrawer from "../components/drawers/EditFilamentDrawer";
 import LoadingDialog from "../components/LoadingDialog";
 import ConfirmationDialog from "../components/ConfirmationDialog";
 import MessageBanner from "../components/MessageBanner";
 import useBearerToken from "../hooks/use-bearer-token";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import AddIcon from "@mui/icons-material/Add";
+import NoteAddIcon from "@mui/icons-material/NoteAdd";
+import AddPrintDrawer from "../components/drawers/AddPrintDrawer";
 
-const columns: GridColDef<IFilament>[] = [
-  { field: "id", headerName: "ID", flex: 1 },
-  { field: "brand", headerName: "Brand", flex: 1 },
-  { field: "name", headerName: "Name", flex: 1 },
-  { field: "type", headerName: "Type", flex: 1 },
-  { field: "color", headerName: "Color", flex: 1 },
-];
 const apiURL = `${process.env.REACT_APP_API_BASE_URL}filament`;
 
 const FilamentPage = () => {
   const { data, mutate, isLoading, isValidating } = useSWR<IFilament[]>(apiURL);
   const [selectedRowId, setSelectedRowId] = useState("");
-  const [addAddEditrowId, setAddEditrowId] = useState("");
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [showLoadingDialog, setShowLoadingDialog] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const bearerToken = useBearerToken();
+  const [addPrintDrawerOpen, setAddPrintDrawerOpen] = useState(false);
 
-  const openDrawer = (from: "add" | "edit") => {
-    if (from === "add") {
-      setAddEditrowId("");
-    } else {
-      setAddEditrowId(selectedRowId);
-    }
+  const openDrawer = (id?: string) => {
+    setSelectedRowId(id || "");
     setDrawerOpen(true);
   };
 
+  const openAddPrintDrawer = (filamentId: string) => {
+    setAddPrintDrawerOpen(true);
+  };
   const deleteFilament = async () => {
     setDeleteDialogOpen(false);
     setShowLoadingDialog(true);
@@ -54,7 +51,48 @@ const FilamentPage = () => {
     }
     setShowLoadingDialog(false);
   };
-
+  const columns: GridColDef<IFilament>[] = [
+    { field: "brand", headerName: "Brand", flex: 1 },
+    { field: "name", headerName: "Name", flex: 1 },
+    { field: "type", headerName: "Type", flex: 1 },
+    { field: "color", headerName: "Color", flex: 1 },
+    {
+      field: "actions",
+      type: "actions",
+      headerName: "Actions",
+      cellClassName: "actions",
+      width: 150,
+      getActions: ({ id }) => {
+        return [
+          <Tooltip title="Add Print" enterDelay={1000}>
+            <GridActionsCellItem
+              icon={<NoteAddIcon />}
+              label="Add Print"
+              onClick={() => openAddPrintDrawer(id.toString())}
+            />
+          </Tooltip>,
+          <Tooltip title="Edit" enterDelay={1000}>
+            <GridActionsCellItem
+              icon={<EditIcon />}
+              label="Edit"
+              onClick={() => openDrawer(id.toString())}
+            />
+          </Tooltip>,
+          <Tooltip title="Delete" enterDelay={1000}>
+            <GridActionsCellItem
+              icon={<DeleteIcon />}
+              label="Delete"
+              onClick={() => {
+                setSelectedRowId(id.toString());
+                setDeleteDialogOpen(true);
+              }}
+              color="inherit"
+            />
+          </Tooltip>,
+        ];
+      },
+    },
+  ];
   return (
     <>
       <MessageBanner
@@ -75,7 +113,19 @@ const FilamentPage = () => {
           setDrawerOpen(false);
           setShowLoadingDialog(false);
         }}
-        filamentId={addAddEditrowId}
+        filamentId={selectedRowId}
+      />
+      <AddPrintDrawer
+        open={addPrintDrawerOpen}
+        onClose={async (updateOccurred) => {
+          if (updateOccurred) {
+            setShowLoadingDialog(true);
+            await mutate();
+          }
+          setAddPrintDrawerOpen(false);
+          setShowLoadingDialog(false);
+        }}
+        filamentId={selectedRowId}
       />
       <ConfirmationDialog
         open={deleteDialogOpen}
@@ -95,18 +145,8 @@ const FilamentPage = () => {
         open={(isLoading && isValidating) || showLoadingDialog}
       ></LoadingDialog>
       <Stack direction="row" spacing={0.5} justifyContent="flex-end">
-        <Button onClick={() => openDrawer("add")}>Add</Button>
-        <Button
-          disabled={selectedRowId === ""}
-          onClick={() => openDrawer("edit")}
-        >
-          Edit
-        </Button>
-        <Button
-          disabled={selectedRowId === ""}
-          onClick={() => setDeleteDialogOpen(true)}
-        >
-          Delete
+        <Button onClick={() => openDrawer()} aria-label="Add">
+          <AddIcon />
         </Button>
       </Stack>
 
@@ -120,10 +160,6 @@ const FilamentPage = () => {
             },
           }}
           pageSizeOptions={[10, 50, 100]}
-          rowSelection
-          onRowSelectionModelChange={(a) =>
-            setSelectedRowId(a[0] ? a[0].toString() : "")
-          }
         />
       )}
     </>
