@@ -235,3 +235,35 @@ Resources:
           Properties:
             Path: /dashboard
             Method: options            
+  LogPrintPOST:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: logprint/POST
+      Handler: app.lambdaHandler
+      Runtime: nodejs18.x
+      Architectures:
+        - x86_64
+      Policies:
+      - AmazonDynamoDBFullAccess
+      Events:
+        Printers:
+          Type: Api
+          Properties:
+            Path: /logprint
+            Method: POST
+  LogPrintOPTIONS:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: logprint/OPTIONS
+      Handler: app.lambdaHandler
+      Runtime: nodejs18.x
+      Architectures:
+        - x86_64
+      Policies:
+      - AmazonDynamoDBFullAccess
+      Events:
+        Printers:
+          Type: Api 
+          Properties:
+            Path: /logprint
+            Method: options            

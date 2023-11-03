@@ -33,6 +33,7 @@ const FilamentPage = () => {
   };
 
   const openAddPrintDrawer = (filamentId: string) => {
+    setSelectedRowId(filamentId);
     setAddPrintDrawerOpen(true);
   };
   const deleteFilament = async () => {
