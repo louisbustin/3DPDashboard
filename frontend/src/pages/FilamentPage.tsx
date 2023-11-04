@@ -11,8 +11,6 @@ import useBearerToken from "../hooks/use-bearer-token";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
-import NoteAddIcon from "@mui/icons-material/NoteAdd";
-import AddPrintDrawer from "../components/drawers/AddPrintDrawer";
 
 const apiURL = `${process.env.REACT_APP_API_BASE_URL}filament`;
 
@@ -25,17 +23,12 @@ const FilamentPage = () => {
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const bearerToken = useBearerToken();
-  const [addPrintDrawerOpen, setAddPrintDrawerOpen] = useState(false);
 
   const openDrawer = (id?: string) => {
     setSelectedRowId(id || "");
     setDrawerOpen(true);
   };
 
-  const openAddPrintDrawer = (filamentId: string) => {
-    setSelectedRowId(filamentId);
-    setAddPrintDrawerOpen(true);
-  };
   const deleteFilament = async () => {
     setDeleteDialogOpen(false);
     setShowLoadingDialog(true);
@@ -65,13 +58,6 @@ const FilamentPage = () => {
       width: 150,
       getActions: ({ id }) => {
         return [
-          <Tooltip title="Add Print" enterDelay={1000}>
-            <GridActionsCellItem
-              icon={<NoteAddIcon />}
-              label="Add Print"
-              onClick={() => openAddPrintDrawer(id.toString())}
-            />
-          </Tooltip>,
           <Tooltip title="Edit" enterDelay={1000}>
             <GridActionsCellItem
               icon={<EditIcon />}
@@ -116,18 +102,7 @@ const FilamentPage = () => {
         }}
         filamentId={selectedRowId}
       />
-      <AddPrintDrawer
-        open={addPrintDrawerOpen}
-        onClose={async (updateOccurred) => {
-          if (updateOccurred) {
-            setShowLoadingDialog(true);
-            await mutate();
-          }
-          setAddPrintDrawerOpen(false);
-          setShowLoadingDialog(false);
-        }}
-        filamentId={selectedRowId}
-      />
+
       <ConfirmationDialog
         open={deleteDialogOpen}
         onCancel={() => setDeleteDialogOpen(false)}

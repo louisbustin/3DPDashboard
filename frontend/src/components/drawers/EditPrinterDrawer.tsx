@@ -60,6 +60,11 @@ const EditPrinterDrawer = (
     });
   };
 
+  const onChangeOctoId = (octoId: string) => {
+    setPrinter((f) => {
+      return { ...f, octoEverywhereId: octoId };
+    });
+  };
   const handleClose = (updateOccurred: boolean) => {
     if (props.onClose) props.onClose(updateOccurred);
     //clear out any saved printers when we close the dialog
@@ -119,6 +124,12 @@ const EditPrinterDrawer = (
             label="Type"
             value={printer.type}
             onChange={(e) => onChangeType(e.target.value)}
+          />
+          <ShrunkTextField
+            id="octoid"
+            label="Octoeverywhere Printer Id"
+            value={printer.octoEverywhereId}
+            onChange={(e) => onChangeOctoId(e.target.value)}
           />
         </Stack>
       </EditDrawer>

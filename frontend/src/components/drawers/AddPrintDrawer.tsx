@@ -12,14 +12,14 @@ import StyledSelect from "../formelements/StyledSelect";
 import IFilament from "../../models/IFilament";
 import { v4 as uuidv4 } from "uuid";
 
-const apiURL = `${process.env.REACT_APP_API_BASE_URL}filament`;
-const printApiURL = `${process.env.REACT_APP_API_BASE_URL}printers`;
+const printerApiURL = `${process.env.REACT_APP_API_BASE_URL}printers`;
+const filamentApiURL = `${process.env.REACT_APP_API_BASE_URL}filament`;
 
 const AddPrintDrawer = (
   props: PropsWithChildren<{
     open: boolean;
     onClose?: (updateOccurred?: boolean) => void;
-    filamentId: string;
+    printerId: string;
   }>
 ) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -28,8 +28,8 @@ const AddPrintDrawer = (
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const bearerToken = useBearerToken();
-  const { data: printers, isLoading: printersLoading } =
-    useSWR<IPrinter[]>(printApiURL);
+  const { data: filament, isLoading: filamentLoading } =
+    useSWR<IFilament[]>(filamentApiURL);
 
   const onChangeAmount = (amount: string) => {
     setPrint((f) => {
@@ -37,9 +37,9 @@ const AddPrintDrawer = (
     });
   };
 
-  const onChangePrinter = (printerId: string) => {
+  const onChangeFilament = (filamentId: string) => {
     setPrint((f) => {
-      return { ...f, printerId };
+      return { ...f, filamentId };
     });
   };
   const onChangeStatus = (status: Status) => {
@@ -57,27 +57,25 @@ const AddPrintDrawer = (
   const savePrint = async () => {
     setIsLoading(true);
 
-    //pull updated filament first
-    const filamentURL = apiURL + "/" + props.filamentId;
+    //pull updated printer first
+    const printerUrl = printerApiURL + "/" + props.printerId;
 
-    const filamentGetResponse = await fetch(filamentURL, {
+    const printerGetResponse = await fetch(printerUrl, {
       method: "GET",
       headers: { Authorization: `Bearer ${bearerToken}` },
     });
-    if (filamentGetResponse.ok) {
+    if (printerGetResponse.ok) {
       print.id = uuidv4();
-      const filament = (await filamentGetResponse.json()) as IFilament;
-      if (filament.prints) {
-        filament.prints.push(print);
+      const p = (await printerGetResponse.json()) as IPrinter;
+      if (p.prints) {
+        p.prints.push(print);
       } else {
-        filament.prints = [print];
+        p.prints = [print];
       }
 
-      console.log(filament);
-
-      const response = await fetch(apiURL, {
+      const response = await fetch(printerApiURL, {
         method: "POST",
-        body: JSON.stringify(filament),
+        body: JSON.stringify(p),
         headers: { Authorization: `Bearer ${bearerToken}` },
       });
       if (response.ok) {
@@ -95,7 +93,7 @@ const AddPrintDrawer = (
 
   return (
     <>
-      <LoadingDialog open={isLoading || printersLoading} />
+      <LoadingDialog open={isLoading || filamentLoading} />
       <MessageBanner
         successMessage={successMessage}
         errorMessage={errorMessage}
@@ -121,15 +119,15 @@ const AddPrintDrawer = (
           />
           <StyledSelect
             id="printer-select"
-            label="Printer"
-            value={print.printerId}
-            onChange={(e) => onChangePrinter(e.target.value as string)}
+            label="Filament"
+            value={print.filamentId}
+            onChange={(e) => onChangeFilament(e.target.value as string)}
           >
-            {!printersLoading &&
-              printers?.map((p) => {
+            {!filamentLoading &&
+              filament?.map((f) => {
                 return (
-                  <MenuItem key={p.id} value={p.id}>
-                    {p.brand} - {p.name} {p.type}
+                  <MenuItem key={f.id} value={f.id}>
+                    {f.brand} - {f.name}
                   </MenuItem>
                 );
               })}
