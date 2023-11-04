@@ -1,25 +1,23 @@
 import useSWR from "swr";
 import IPrinter from "../models/IPrinter";
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { DataGrid, GridActionsCellItem, GridColDef } from "@mui/x-data-grid";
 import { useState } from "react";
-import { Button, Stack } from "@mui/material";
+import { Button, Stack, Tooltip } from "@mui/material";
 import EditPrinterDrawer from "../components/drawers/EditPrinterDrawer";
 import LoadingDialog from "../components/LoadingDialog";
 import ConfirmationDialog from "../components/ConfirmationDialog";
 import MessageBanner from "../components/MessageBanner";
 import useBearerToken from "../hooks/use-bearer-token";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import AddIcon from "@mui/icons-material/Add";
+import NoteAddIcon from "@mui/icons-material/NoteAdd";
+import AddPrintDrawer from "../components/drawers/AddPrintDrawer";
 
-const columns: GridColDef<IPrinter>[] = [
-  { field: "id", headerName: "ID", flex: 1 },
-  { field: "brand", headerName: "Brand", flex: 1 },
-  { field: "name", headerName: "Name", flex: 1 },
-  { field: "type", headerName: "Type", flex: 1 },
-];
 const apiURL = `${process.env.REACT_APP_API_BASE_URL}printers`;
 
 const PrinterPage = () => {
   const { data, mutate, isLoading, isValidating } = useSWR<IPrinter[]>(apiURL);
-  const [selectedRowId, setSelectedRowId] = useState("");
   const [addAddEditrowId, setAddEditrowId] = useState("");
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -27,20 +25,17 @@ const PrinterPage = () => {
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const bearerToken = useBearerToken();
+  const [addPrintDrawerOpen, setAddPrintDrawerOpen] = useState(false);
 
-  const openDrawer = (from: "add" | "edit") => {
-    if (from === "add") {
-      setAddEditrowId("");
-    } else {
-      setAddEditrowId(selectedRowId);
-    }
+  const openDrawer = (id: string) => {
+    setAddEditrowId(id);
     setDrawerOpen(true);
   };
 
   const deletePrinter = async () => {
     setDeleteDialogOpen(false);
     setShowLoadingDialog(true);
-    const response = await fetch(`${apiURL}/${selectedRowId}`, {
+    const response = await fetch(`${apiURL}/${addAddEditrowId}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${bearerToken}` },
     });
@@ -53,6 +48,54 @@ const PrinterPage = () => {
     }
     setShowLoadingDialog(false);
   };
+
+  const openAddPrintDrawer = (filamentId: string) => {
+    setAddEditrowId(filamentId);
+    setAddPrintDrawerOpen(true);
+  };
+
+  const columns: GridColDef<IPrinter>[] = [
+    { field: "id", headerName: "ID", flex: 1 },
+    { field: "brand", headerName: "Brand", flex: 1 },
+    { field: "name", headerName: "Name", flex: 1 },
+    { field: "type", headerName: "Type", flex: 1 },
+    {
+      field: "actions",
+      type: "actions",
+      headerName: "Actions",
+      cellClassName: "actions",
+      width: 150,
+      getActions: ({ id }) => {
+        return [
+          <Tooltip title="Add Print" enterDelay={1000}>
+            <GridActionsCellItem
+              icon={<NoteAddIcon />}
+              label="Add Print"
+              onClick={() => openAddPrintDrawer(id.toString())}
+            />
+          </Tooltip>,
+          <Tooltip title="Edit" enterDelay={1000}>
+            <GridActionsCellItem
+              icon={<EditIcon />}
+              label="Edit"
+              onClick={() => openDrawer(id.toString())}
+            />
+          </Tooltip>,
+          <Tooltip title="Delete" enterDelay={1000}>
+            <GridActionsCellItem
+              icon={<DeleteIcon />}
+              label="Delete"
+              onClick={() => {
+                setAddEditrowId(id.toString());
+                setDeleteDialogOpen(true);
+              }}
+              color="inherit"
+            />
+          </Tooltip>,
+        ];
+      },
+    },
+  ];
 
   return (
     <>
@@ -76,6 +119,18 @@ const PrinterPage = () => {
         }}
         printerId={addAddEditrowId}
       />
+      <AddPrintDrawer
+        open={addPrintDrawerOpen}
+        onClose={async (updateOccurred) => {
+          if (updateOccurred) {
+            setShowLoadingDialog(true);
+            await mutate();
+          }
+          setAddPrintDrawerOpen(false);
+          setShowLoadingDialog(false);
+        }}
+        printerId={addAddEditrowId}
+      />
       <ConfirmationDialog
         open={deleteDialogOpen}
         onCancel={() => setDeleteDialogOpen(false)}
@@ -94,18 +149,8 @@ const PrinterPage = () => {
         open={(isLoading && isValidating) || showLoadingDialog}
       ></LoadingDialog>
       <Stack direction="row" spacing={0.5} justifyContent="flex-end">
-        <Button onClick={() => openDrawer("add")}>Add</Button>
-        <Button
-          disabled={selectedRowId === ""}
-          onClick={() => openDrawer("edit")}
-        >
-          Edit
-        </Button>
-        <Button
-          disabled={selectedRowId === ""}
-          onClick={() => setDeleteDialogOpen(true)}
-        >
-          Delete
+        <Button onClick={() => openDrawer("")}>
+          <AddIcon />
         </Button>
       </Stack>
 
@@ -119,10 +164,6 @@ const PrinterPage = () => {
             },
           }}
           pageSizeOptions={[10, 50, 100]}
-          rowSelection
-          onRowSelectionModelChange={(a) =>
-            setSelectedRowId(a[0] ? a[0].toString() : "")
-          }
         />
       )}
     </>

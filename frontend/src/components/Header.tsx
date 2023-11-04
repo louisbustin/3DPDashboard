@@ -16,7 +16,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 
 const pages = [
   { name: "Filament", link: "/filament" },
-  { name: "Resin", link: "/resin" },
+  //{ name: "Resin", link: "/resin" },
   { name: "Printers", link: "/printers" },
 ];
 
