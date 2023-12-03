@@ -12,7 +12,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import NoteAddIcon from "@mui/icons-material/NoteAdd";
-import AddPrintDrawer from "../components/drawers/AddPrintDrawer";
+import AddPrintDrawer from "../components/drawers/EditPrintDrawer";
 
 const apiURL = `${process.env.REACT_APP_API_BASE_URL}printers`;
 

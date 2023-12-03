@@ -17,7 +17,8 @@ import { useAuth0 } from "@auth0/auth0-react";
 const pages = [
   { name: "Filament", link: "/filament" },
   //{ name: "Resin", link: "/resin" },
-  { name: "Printers", link: "/printers" },
+  { name: "Printers", link: "/dashboard/printers" },
+  { name: "Prints", link: "/prints" },
 ];
 
 const Header = () => {

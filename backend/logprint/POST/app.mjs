@@ -49,6 +49,7 @@ export const lambdaHandler = async (event, context) => {
           filamentId: "",
           status: newStatus,
           insertedAt: Date.now(),
+          ...requestJSON,
         });
       }
 

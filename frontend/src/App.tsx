@@ -8,6 +8,8 @@ import { useDarkMode } from "usehooks-ts";
 import { Container } from "@mui/material";
 import { SWRConfig } from "swr";
 import useBearerToken from "./hooks/use-bearer-token";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 function App() {
   const { isDarkMode } = useDarkMode();
@@ -42,18 +44,21 @@ function App() {
 
   return (
     <>
-      <SWRConfig value={swrConfig}>
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
-          <Header />
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <SWRConfig value={swrConfig}>
+          <ThemeProvider theme={theme}>
+            <CssBaseline />
+            <Header />
 
-          <Container>
-            <Outlet />
-          </Container>
+            <Container>
+              <Outlet />
+              <div style={{ marginTop: 60 }}></div>
+            </Container>
 
-          <Footer />
-        </ThemeProvider>
-      </SWRConfig>
+            <Footer />
+          </ThemeProvider>
+        </SWRConfig>
+      </LocalizationProvider>
     </>
   );
 }
