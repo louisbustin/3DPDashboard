@@ -20,6 +20,9 @@ import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 import ResinPage from "./pages/ResinPage";
+import PrintPage from "./pages/PrintPage";
+import PrinterDashboard from "./components/dashboards/PrinterDashboard";
+import PrintersDashboard from "./components/dashboards/PrintersDashboard";
 
 const router = createBrowserRouter([
   {
@@ -30,6 +33,20 @@ const router = createBrowserRouter([
       {
         path: "",
         element: <HomePage />,
+      },
+      {
+        path: "dashboard",
+        children: [
+          {
+            path: "printers",
+            element: <PrintersDashboard />,
+          },
+          {
+            path: "printers/:printerid",
+            element: <PrinterDashboard />,
+          },
+          { path: "", element: <HomePage /> },
+        ],
       },
       {
         path: "profile",
@@ -48,6 +65,10 @@ const router = createBrowserRouter([
       {
         path: "contact",
         element: <ContactPage />,
+      },
+      {
+        path: "prints",
+        element: <PrintPage />,
       },
       {
         path: "filament",

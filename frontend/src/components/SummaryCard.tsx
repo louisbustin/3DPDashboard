@@ -10,7 +10,8 @@ const SummaryCard = (
   props: PropsWithoutRef<{
     title: string;
     total?: number;
-    icon?: string;
+    iconLocation?: string;
+    iconElement?: JSX.Element;
     color?: "primary" | "secondary";
     sx?: object;
     link?: string;
@@ -35,16 +36,21 @@ const SummaryCard = (
       }}
       style={{ cursor: props.link ? "pointer" : "default" }}
     >
-      {props.icon && (
+      {(props.iconLocation || props.iconElement) && (
         <Box sx={{ width: 64, height: 64 }}>
           <Avatar sx={{ width: 64, height: 64 }}>
-            <img src={props.icon} width={64} alt="" />
+            {props.iconLocation && (
+              <img src={props.iconLocation} width={64} alt="" />
+            )}
+            {props.iconElement && props.iconElement}
           </Avatar>
         </Box>
       )}
 
       <Stack spacing={0.5}>
-        <Typography variant="h4">{props.total}</Typography>
+        {props.total !== null && (
+          <Typography variant="h4">{props.total}</Typography>
+        )}
 
         <Typography variant="subtitle2" sx={{ color: "text.disabled" }}>
           {props.title}

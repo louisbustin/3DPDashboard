@@ -5,7 +5,7 @@ export default interface IPrinter {
   name?: string;
   brand?: string;
   type?: string;
-  prints: [IPrint];
+  prints: IPrint[];
   octoEverywhereId?: string;
 }
 

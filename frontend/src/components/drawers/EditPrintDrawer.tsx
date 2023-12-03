@@ -1,4 +1,4 @@
-import { PropsWithChildren, useState } from "react";
+import { PropsWithChildren, useEffect, useState } from "react";
 import EditDrawer from "./EditDrawer";
 import { MenuItem, Stack } from "@mui/material";
 import useBearerToken from "../../hooks/use-bearer-token";
@@ -15,11 +15,12 @@ import { v4 as uuidv4 } from "uuid";
 const printerApiURL = `${process.env.REACT_APP_API_BASE_URL}printers`;
 const filamentApiURL = `${process.env.REACT_APP_API_BASE_URL}filament`;
 
-const AddPrintDrawer = (
+const EditPrintDrawer = (
   props: PropsWithChildren<{
     open: boolean;
     onClose?: (updateOccurred?: boolean) => void;
     printerId: string;
+    print?: IPrint;
   }>
 ) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -30,6 +31,12 @@ const AddPrintDrawer = (
   const bearerToken = useBearerToken();
   const { data: filament, isLoading: filamentLoading } =
     useSWR<IFilament[]>(filamentApiURL);
+
+  useEffect(() => {
+    if (props.print) {
+      setPrint({ ...props.print });
+    }
+  }, [props.print]);
 
   const onChangeAmount = (amount: string) => {
     setPrint((f) => {
@@ -47,7 +54,11 @@ const AddPrintDrawer = (
       return { ...f, status };
     });
   };
-
+  const onChangeDuration = (durationSec: number) => {
+    setPrint((f) => {
+      return { ...f, DurationSecs: durationSec };
+    });
+  };
   const handleClose = (updateOccurred: boolean) => {
     if (props.onClose) props.onClose(updateOccurred);
     //clear out any saved filaments when we close the dialog
@@ -65,10 +76,17 @@ const AddPrintDrawer = (
       headers: { Authorization: `Bearer ${bearerToken}` },
     });
     if (printerGetResponse.ok) {
-      print.id = uuidv4();
       const p = (await printerGetResponse.json()) as IPrinter;
       if (p.prints) {
-        p.prints.push(print);
+        const printIndex = p.prints.findIndex((pr) => {
+          return pr.id === print.id;
+        });
+        if (printIndex >= 0) {
+          p.prints[printIndex] = { ...p.prints[printIndex], ...print };
+        } else {
+          print.id = uuidv4();
+          p.prints.push(print);
+        }
       } else {
         p.prints = [print];
       }
@@ -142,11 +160,23 @@ const AddPrintDrawer = (
             <MenuItem value="Cancelled">Cancelled</MenuItem>
             <MenuItem value="Pending">Pending</MenuItem>
             <MenuItem value="Active">Active</MenuItem>
+            <MenuItem value="Failed">Failed</MenuItem>
           </StyledSelect>
+          <ShrunkTextField
+            id="duration"
+            label="Duration (secs)"
+            value={print.DurationSec}
+            onChange={(e) => onChangeDuration(Number(e.target.value))}
+            type="number"
+          />
+          Progress?: number; EventType?: number; FileName?: string;
+          QuickViewUrl?: string; Error?: string; PrinterId?: string;
+          PrinterName?: string; ZOffsetMM?: string; SnapshotUrl?: string;
+          TimeRemaningSec?: number;
         </Stack>
       </EditDrawer>
     </>
   );
 };
 
-export default AddPrintDrawer;
+export default EditPrintDrawer;
