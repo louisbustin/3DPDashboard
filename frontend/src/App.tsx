@@ -7,13 +7,13 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { useDarkMode } from "usehooks-ts";
 import { Container } from "@mui/material";
 import { SWRConfig } from "swr";
-import useBearerToken from "./hooks/use-bearer-token";
+import useAPIToken from "./hooks/use-api-token";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 function App() {
   const { isDarkMode } = useDarkMode();
-  const bearerToken = useBearerToken();
+  const bearerToken = useAPIToken();
 
   const theme = createTheme({
     palette: {

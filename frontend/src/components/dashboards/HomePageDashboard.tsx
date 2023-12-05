@@ -3,15 +3,17 @@ import SummaryCard from "../SummaryCard";
 import filamentImage from "../../images/filamentspools.png";
 import printerImage from "../../images/3dprinter.png";
 import printImage from "../../images/3dprint.png";
-import useSWR from "swr";
 import IDashboard from "../../models/IDashboard";
+import LoadingDialog from "../LoadingDialog";
+import useFetch from "../../hooks/use-fetch";
 
 const apiURL = `${process.env.REACT_APP_API_BASE_URL}dashboard`;
 
 const HomePageDashboard = () => {
-  const { data } = useSWR<IDashboard>(apiURL);
+  const { data, isLoading } = useFetch<IDashboard>(apiURL);
   return (
     <>
+      <LoadingDialog open={isLoading} />
       <h2>Welcome to your dashboard!</h2>
       <Grid container spacing={3} justifyContent="center">
         <Grid item xs={12} md={4}>

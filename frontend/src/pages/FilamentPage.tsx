@@ -7,7 +7,7 @@ import EditFilamentDrawer from "../components/drawers/EditFilamentDrawer";
 import LoadingDialog from "../components/LoadingDialog";
 import ConfirmationDialog from "../components/ConfirmationDialog";
 import MessageBanner from "../components/MessageBanner";
-import useBearerToken from "../hooks/use-bearer-token";
+import useAPIToken from "../hooks/use-api-token";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
@@ -22,7 +22,7 @@ const FilamentPage = () => {
   const [showLoadingDialog, setShowLoadingDialog] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const bearerToken = useBearerToken();
+  const bearerToken = useAPIToken();
 
   const openDrawer = (id?: string) => {
     setSelectedRowId(id || "");

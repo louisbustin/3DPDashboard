@@ -1,6 +1,7 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { PutCommand, DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
 import { v4 as uuidv4 } from "uuid";
+import jsonwebtoken from "jsonwebtoken";
 
 const client = new DynamoDBClient({});
 const dynamo = DynamoDBDocumentClient.from(client, {
@@ -11,14 +12,7 @@ const dynamo = DynamoDBDocumentClient.from(client, {
 const tableName = "3dpdashboard_filament";
 
 const getUserInfo = async (authToken) => {
-  const response = await fetch("https://eforge.us.auth0.com/userinfo", {
-    headers: { Authorization: authToken },
-  });
-  if (response && response.status === 200) {
-    return await response.json();
-  } else {
-    throw new Error("unable to verify user");
-  }
+  return jsonwebtoken.decode(authToken.replace("Bearer ", ""));
 };
 
 export const lambdaHandler = async (event, context) => {

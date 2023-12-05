@@ -2,7 +2,7 @@ import { PropsWithChildren, useEffect, useState } from "react";
 import EditDrawer from "./EditDrawer";
 import { Stack } from "@mui/material";
 import IPrinter, { getDefaultPrinter } from "../../models/IPrinter";
-import useBearerToken from "../../hooks/use-bearer-token";
+import useAPIToken from "../../hooks/use-api-token";
 import LoadingDialog from "../LoadingDialog";
 import MessageBanner from "../MessageBanner";
 import ShrunkTextField from "../formelements/ShrunkTextField";
@@ -21,7 +21,7 @@ const EditPrinterDrawer = (
 
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  const bearerToken = useBearerToken();
+  const bearerToken = useAPIToken();
 
   useEffect(() => {
     const getPrinter = async () => {

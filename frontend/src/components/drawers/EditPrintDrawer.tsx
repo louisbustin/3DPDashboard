@@ -1,7 +1,7 @@
 import { PropsWithChildren, useEffect, useState } from "react";
 import EditDrawer from "./EditDrawer";
 import { MenuItem, Stack } from "@mui/material";
-import useBearerToken from "../../hooks/use-bearer-token";
+import useAPIToken from "../../hooks/use-api-token";
 import LoadingDialog from "../LoadingDialog";
 import MessageBanner from "../MessageBanner";
 import ShrunkTextField from "../formelements/ShrunkTextField";
@@ -28,7 +28,7 @@ const EditPrintDrawer = (
 
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  const bearerToken = useBearerToken();
+  const bearerToken = useAPIToken();
   const { data: filament, isLoading: filamentLoading } =
     useSWR<IFilament[]>(filamentApiURL);
 
@@ -136,19 +136,27 @@ const EditPrintDrawer = (
             onChange={(e) => onChangeAmount(e.target.value)}
           />
           <StyledSelect
-            id="printer-select"
+            id="printer-filament"
             label="Filament"
             value={print.filamentId}
             onChange={(e) => onChangeFilament(e.target.value as string)}
           >
             {!filamentLoading &&
-              filament?.map((f) => {
-                return (
-                  <MenuItem key={f.id} value={f.id}>
-                    {f.brand} - {f.name}
-                  </MenuItem>
-                );
-              })}
+              filament
+                ?.sort(
+                  (a, b) =>
+                    a.type.localeCompare(b.type) ||
+                    a.brand.localeCompare(b.brand) ||
+                    a.name.localeCompare(b.name) ||
+                    a.color.localeCompare(b.color)
+                )
+                .map((f) => {
+                  return (
+                    <MenuItem key={f.id} value={f.id}>
+                      {f.type && `(${f.type})`} {f.brand} - {f.name} - {f.color}
+                    </MenuItem>
+                  );
+                })}
           </StyledSelect>
           <StyledSelect
             id="print-status"
@@ -165,14 +173,10 @@ const EditPrintDrawer = (
           <ShrunkTextField
             id="duration"
             label="Duration (secs)"
-            value={print.DurationSec}
+            value={print.DurationSec || 0}
             onChange={(e) => onChangeDuration(Number(e.target.value))}
             type="number"
           />
-          Progress?: number; EventType?: number; FileName?: string;
-          QuickViewUrl?: string; Error?: string; PrinterId?: string;
-          PrinterName?: string; ZOffsetMM?: string; SnapshotUrl?: string;
-          TimeRemaningSec?: number;
         </Stack>
       </EditDrawer>
     </>
