@@ -1,15 +1,9 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, QueryCommand } from "@aws-sdk/lib-dynamodb";
+import jsonwebtoken from "jsonwebtoken";
 
 const getUserInfo = async (authToken) => {
-  const response = await fetch("https://eforge.us.auth0.com/userinfo", {
-    headers: { Authorization: authToken },
-  });
-  if (response && response.status === 200) {
-    return await response.json();
-  } else {
-    throw new Error("unable to verify user");
-  }
+  return jsonwebtoken.decode(authToken.replace("Bearer ", ""));
 };
 
 const client = new DynamoDBClient({});
@@ -19,6 +13,9 @@ const tableName = "3dpdashboard_printers";
 export const lambdaHandler = async (event, context) => {
   try {
     const user = await getUserInfo(event.headers.Authorization);
+    if (!user) {
+      return { statusCode: 401, body: "unauthorized" };
+    }
     const command = new QueryCommand({
       TableName: tableName,
       IndexName: "usersub-index",

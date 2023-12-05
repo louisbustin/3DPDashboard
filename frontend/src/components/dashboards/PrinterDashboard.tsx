@@ -2,7 +2,6 @@ import { Grid, Stack, Tooltip } from "@mui/material";
 import SummaryCard from "../SummaryCard";
 import printImage from "../../images/3dprint.png";
 import { useParams } from "react-router-dom";
-import useSWR from "swr";
 import IPrinter from "../../models/IPrinter";
 import { useEffect, useState } from "react";
 import ImageWithText from "../formelements/ImageWithText";
@@ -16,10 +15,11 @@ import moment from "moment";
 import EditPrintDrawer from "../drawers/EditPrintDrawer";
 import ConfirmationDialog from "../ConfirmationDialog";
 import MessageBanner from "../MessageBanner";
-import useBearerToken from "../../hooks/use-bearer-token";
+import useAPIToken from "../../hooks/use-api-token";
 import LoadingDialog from "../LoadingDialog";
 import { DatePicker } from "@mui/x-date-pickers";
 import { Dayjs } from "dayjs";
+import useFetch from "../../hooks/use-fetch";
 
 const apiURL = `${process.env.REACT_APP_API_BASE_URL}printers/`;
 type IPrinterDashboardData = {
@@ -31,7 +31,7 @@ type IPrinterDashboardData = {
 
 const PrinterDashboard = () => {
   const { printerid } = useParams();
-  const { data, isLoading, mutate } = useSWR<IPrinter>(apiURL + printerid);
+  const { data, isLoading, mutate } = useFetch<IPrinter>(apiURL + printerid);
   const [dashboardData, setDashboardData] = useState<IPrinterDashboardData>();
   const [printFilter, setPrintFilter] = useState("");
   const [showEditPrintDrawer, setShowEditPrintDrawer] = useState(false);
@@ -39,7 +39,7 @@ const PrinterDashboard = () => {
   const [showDeletePrintDialog, setShowDeletePrintDialog] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const bearerToken = useBearerToken();
+  const bearerToken = useAPIToken();
   const [showLoadingDialog, setShowLoadingDialog] = useState(false);
   const [minDateFilter, setMinDateFilter] = useState<number>(0);
   const [maxDateFilter, setMaxDateFilter] = useState<number>(9999999999999);

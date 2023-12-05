@@ -39,11 +39,11 @@ const router = createBrowserRouter([
         children: [
           {
             path: "printers",
-            element: <PrintersDashboard />,
+            element: <AuthenticationGuard component={PrintersDashboard} />,
           },
           {
             path: "printers/:printerid",
-            element: <PrinterDashboard />,
+            element: <AuthenticationGuard component={PrinterDashboard} />,
           },
           { path: "", element: <HomePage /> },
         ],
