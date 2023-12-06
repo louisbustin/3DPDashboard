@@ -29,7 +29,7 @@ const HomePageDashboard = () => {
             title="Printers"
             total={data?.printerCount || 0}
             iconLocation={printerImage}
-            link="/printers"
+            link="/dashboard/printers"
           ></SummaryCard>
         </Grid>
         <Grid item xs={12} md={4}>

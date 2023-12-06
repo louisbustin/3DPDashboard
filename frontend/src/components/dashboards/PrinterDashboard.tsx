@@ -20,6 +20,7 @@ import LoadingDialog from "../LoadingDialog";
 import { DatePicker } from "@mui/x-date-pickers";
 import { Dayjs } from "dayjs";
 import useFetch from "../../hooks/use-fetch";
+import ImageHoverZoom from "../ImageHoverZoom";
 
 const apiURL = `${process.env.REACT_APP_API_BASE_URL}printers/`;
 type IPrinterDashboardData = {
@@ -98,7 +99,7 @@ const PrinterDashboard = () => {
       });
       if (response && response.ok) {
         setSuccessMessage("Print deleted successfully");
-        await mutate();
+        mutate();
         setTimeout(() => setSuccessMessage(""), 5000);
         setShowLoadingDialog(false);
       } else {
@@ -110,9 +111,13 @@ const PrinterDashboard = () => {
     {
       field: "SnapshotUrl",
       headerName: "Snapshot",
-      renderCell: (params) => (
-        <img src={params.row.SnapshotUrl} width={50} alt="Print Snapshot" />
-      ),
+      renderCell: (params) =>
+        params.row.SnapshotUrl && (
+          <ImageHoverZoom
+            imagePath={params.row.SnapshotUrl}
+            width={50}
+          ></ImageHoverZoom>
+        ),
     },
     { field: "status", headerName: "Status", flex: 1 },
     { field: "FileName", headerName: "File Name", flex: 1 },
@@ -161,6 +166,8 @@ const PrinterDashboard = () => {
 
   return (
     <>
+      <h2>Dashboard for {data?.name}</h2>
+      <LoadingDialog open={showLoadingDialog || isLoading}></LoadingDialog>
       <MessageBanner
         successMessage={successMessage}
         errorMessage={errorMessage}
@@ -169,8 +176,6 @@ const PrinterDashboard = () => {
           setErrorMessage("");
         }}
       ></MessageBanner>
-      <h2>Dashboard for {data?.name}</h2>
-      <LoadingDialog open={showLoadingDialog}></LoadingDialog>
       <Grid container spacing={3} justifyContent="center">
         {dashboardData && (
           <>
@@ -239,7 +244,7 @@ const PrinterDashboard = () => {
             </Grid>
           </>
         )}
-        {!isLoading && data && (
+        {data && (
           <>
             <Grid item xs={12}>
               <Stack direction="row" display="flex" alignItems="center">

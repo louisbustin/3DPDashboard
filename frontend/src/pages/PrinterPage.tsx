@@ -1,4 +1,3 @@
-import useSWR from "swr";
 import IPrinter from "../models/IPrinter";
 import { DataGrid, GridActionsCellItem, GridColDef } from "@mui/x-data-grid";
 import { useState } from "react";
@@ -13,11 +12,12 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import NoteAddIcon from "@mui/icons-material/NoteAdd";
 import AddPrintDrawer from "../components/drawers/EditPrintDrawer";
+import useFetch from "../hooks/use-fetch";
 
 const apiURL = `${process.env.REACT_APP_API_BASE_URL}printers`;
 
 const PrinterPage = () => {
-  const { data, mutate, isLoading, isValidating } = useSWR<IPrinter[]>(apiURL);
+  const { data, mutate, isLoading } = useFetch<IPrinter[]>(apiURL);
   const [addAddEditrowId, setAddEditrowId] = useState("");
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -145,9 +145,7 @@ const PrinterPage = () => {
       </ConfirmationDialog>
 
       <h2>Printers</h2>
-      <LoadingDialog
-        open={(isLoading && isValidating) || showLoadingDialog}
-      ></LoadingDialog>
+      <LoadingDialog open={isLoading || showLoadingDialog}></LoadingDialog>
       <Stack direction="row" spacing={0.5} justifyContent="flex-end">
         <Button onClick={() => openDrawer("")}>
           <AddIcon />

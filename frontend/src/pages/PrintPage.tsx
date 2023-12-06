@@ -5,7 +5,6 @@ import MessageBanner from "../components/MessageBanner";
 //const apiURL = `${process.env.REACT_APP_API_BASE_URL}printers`;
 
 const PrintPage = () => {
-  //const { data, mutate, isLoading, isValidating } = useSWR<IPrinter[]>(apiURL);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
