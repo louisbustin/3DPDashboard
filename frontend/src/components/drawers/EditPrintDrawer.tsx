@@ -6,11 +6,11 @@ import LoadingDialog from "../LoadingDialog";
 import MessageBanner from "../MessageBanner";
 import ShrunkTextField from "../formelements/ShrunkTextField";
 import IPrint, { Status, getDefaultPrint } from "../../models/IPrint";
-import useSWR from "swr";
 import IPrinter from "../../models/IPrinter";
 import StyledSelect from "../formelements/StyledSelect";
 import IFilament from "../../models/IFilament";
 import { v4 as uuidv4 } from "uuid";
+import useFetch from "../../hooks/use-fetch";
 
 const printerApiURL = `${process.env.REACT_APP_API_BASE_URL}printers`;
 const filamentApiURL = `${process.env.REACT_APP_API_BASE_URL}filament`;
@@ -30,7 +30,7 @@ const EditPrintDrawer = (
   const [successMessage, setSuccessMessage] = useState("");
   const bearerToken = useAPIToken();
   const { data: filament, isLoading: filamentLoading } =
-    useSWR<IFilament[]>(filamentApiURL);
+    useFetch<IFilament[]>(filamentApiURL);
 
   useEffect(() => {
     if (props.print) {
@@ -104,7 +104,7 @@ const EditPrintDrawer = (
         setErrorMessage(`Creation failed with message: ${response.statusText}`);
       }
     } else {
-      setErrorMessage("Creation failed - cannot get current filament");
+      setErrorMessage("Creation failed - cannot get current printer");
     }
     setIsLoading(false);
   };
@@ -127,7 +127,19 @@ const EditPrintDrawer = (
         hideDeleteButton={true}
       >
         <Stack spacing={2}>
-          <h2>New Print</h2>
+          <h2>{props.print?.id ? "Edit" : "New"} Print</h2>
+          <StyledSelect
+            id="print-status"
+            label="Status"
+            value={print.status}
+            onChange={(e) => onChangeStatus(e.target.value as Status)}
+          >
+            <MenuItem value="Complete">Complete</MenuItem>
+            <MenuItem value="Cancelled">Cancelled</MenuItem>
+            <MenuItem value="Pending">Pending</MenuItem>
+            <MenuItem value="Active">Active</MenuItem>
+            <MenuItem value="Failed">Failed</MenuItem>
+          </StyledSelect>
           <ShrunkTextField
             required
             id="amount"
@@ -157,18 +169,6 @@ const EditPrintDrawer = (
                     </MenuItem>
                   );
                 })}
-          </StyledSelect>
-          <StyledSelect
-            id="print-status"
-            label="Status"
-            value={print.status}
-            onChange={(e) => onChangeStatus(e.target.value as Status)}
-          >
-            <MenuItem value="Complete">Complete</MenuItem>
-            <MenuItem value="Cancelled">Cancelled</MenuItem>
-            <MenuItem value="Pending">Pending</MenuItem>
-            <MenuItem value="Active">Active</MenuItem>
-            <MenuItem value="Failed">Failed</MenuItem>
           </StyledSelect>
           <ShrunkTextField
             id="duration"

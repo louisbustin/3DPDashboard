@@ -1,17 +1,10 @@
-import React from "react";
+import React, { Suspense } from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
 import App from "./App";
 import { Auth0Provider } from "@auth0/auth0-react";
 import reportWebVitals from "./reportWebVitals";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import ProfilePage from "./pages/ProfilePage";
-import ErrorPage from "./ErrorPage";
-import PrinterPage from "./pages/PrinterPage";
-import FilamentPage from "./pages/FilamentPage";
-import TermsPage from "./pages/TermsPage";
-import PrivacyPage from "./pages/PrivacyPage";
-import ContactPage from "./pages/ContactPage";
 import HomePage from "./pages/HomePage";
 import { AuthenticationGuard } from "./components/AuthenticationGuard";
 
@@ -21,8 +14,21 @@ import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 import ResinPage from "./pages/ResinPage";
 import PrintPage from "./pages/PrintPage";
-import PrinterDashboard from "./components/dashboards/PrinterDashboard";
-import PrintersDashboard from "./components/dashboards/PrintersDashboard";
+import LoadingDialog from "./components/LoadingDialog";
+
+const PrivacyPage = React.lazy(() => import("./pages/PrivacyPage"));
+const ProfilePage = React.lazy(() => import("./pages/ProfilePage"));
+const ErrorPage = React.lazy(() => import("./ErrorPage"));
+const PrinterPage = React.lazy(() => import("./pages/PrinterPage"));
+const FilamentPage = React.lazy(() => import("./pages/FilamentPage"));
+const TermsPage = React.lazy(() => import("./pages/TermsPage"));
+const ContactPage = React.lazy(() => import("./pages/ContactPage"));
+const PrinterDashboard = React.lazy(
+  () => import("./components/dashboards/PrinterDashboard")
+);
+const PrintersDashboard = React.lazy(
+  () => import("./components/dashboards/PrintersDashboard")
+);
 
 const router = createBrowserRouter([
   {
@@ -105,7 +111,9 @@ root.render(
         redirect_uri: window.location.origin,
       }}
     >
-      <RouterProvider router={router} />
+      <Suspense fallback={<LoadingDialog open={true} />}>
+        <RouterProvider router={router} />
+      </Suspense>
     </Auth0Provider>
   </React.StrictMode>
 );
