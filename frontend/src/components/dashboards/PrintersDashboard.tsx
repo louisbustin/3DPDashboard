@@ -5,6 +5,7 @@ import IPrinter from "../../models/IPrinter";
 import ImageWithText from "../formelements/ImageWithText";
 import LoadingDialog from "../LoadingDialog";
 import useFetch from "../../hooks/use-fetch";
+import { isArray } from "lodash";
 
 const apiURL = `${process.env.REACT_APP_API_BASE_URL}printers`;
 
@@ -17,6 +18,7 @@ const PrintersDashboard = () => {
       <Grid container spacing={3} justifyContent="center">
         {!isLoading &&
           data &&
+          isArray(data) &&
           data.map((p, index) => {
             return (
               <Grid item xs={12} md={4} key={p.id}>

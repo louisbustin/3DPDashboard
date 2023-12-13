@@ -17,7 +17,7 @@ import useFetch from "../hooks/use-fetch";
 const apiURL = `${process.env.REACT_APP_API_BASE_URL}printers`;
 
 const PrinterPage = () => {
-  const { data, mutate, isLoading } = useFetch<IPrinter[]>(apiURL);
+  const { data, refresh, isLoading } = useFetch<IPrinter[]>(apiURL);
   const [addAddEditrowId, setAddEditrowId] = useState("");
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -40,7 +40,7 @@ const PrinterPage = () => {
       headers: { Authorization: `Bearer ${bearerToken}` },
     });
     if (response.ok) {
-      await mutate();
+      await refresh();
       setSuccessMessage("Printer successfully deleted.");
       setTimeout(() => setSuccessMessage(""), 5000);
     } else {
@@ -112,7 +112,7 @@ const PrinterPage = () => {
         onClose={async (updateOccurred) => {
           if (updateOccurred) {
             setShowLoadingDialog(true);
-            await mutate();
+            await refresh();
           }
           setDrawerOpen(false);
           setShowLoadingDialog(false);
@@ -124,7 +124,7 @@ const PrinterPage = () => {
         onClose={async (updateOccurred) => {
           if (updateOccurred) {
             setShowLoadingDialog(true);
-            await mutate();
+            await refresh();
           }
           setAddPrintDrawerOpen(false);
           setShowLoadingDialog(false);

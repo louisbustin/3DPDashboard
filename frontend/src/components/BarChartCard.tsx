@@ -1,15 +1,15 @@
-import { Card } from "@mui/material";
+import { BarChart } from "@mui/x-charts";
+import { BarChartProps } from "@mui/x-charts/BarChart/BarChart";
 import Typography from "@mui/material/Typography";
-import { PieChart } from "@mui/x-charts";
-import { PieChartProps } from "@mui/x-charts/PieChart/PieChart";
 import { PropsWithoutRef } from "react";
+import { Card } from "@mui/material";
 
-const PieChartCard = (
+const BarChartCard = (
   props: PropsWithoutRef<{
     color?: "primary" | "secondary";
     sx?: object;
     link?: string;
-    pieChartProps: PieChartProps;
+    barCharProps: BarChartProps;
     title?: string;
     height?: string;
   }>
@@ -25,9 +25,9 @@ const PieChartCard = (
       >
         {props.title}
       </Typography>
-      <PieChart {...props.pieChartProps} sx={{ align: "center" }} />
+      <BarChart {...props.barCharProps} sx={{ align: "center" }} />
     </Card>
   );
 };
 
-export default PieChartCard;
+export default BarChartCard;

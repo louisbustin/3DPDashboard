@@ -10,12 +10,13 @@ import useAPIToken from "../hooks/use-api-token";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
-import useFetch from "../hooks/use-fetch";
+import useFilament from "../hooks/use-filament";
+import _ from "lodash";
 
 const apiURL = `${process.env.REACT_APP_API_BASE_URL}filament`;
 
 const FilamentPage = () => {
-  const { data, mutate, isLoading } = useFetch<IFilament[]>(apiURL);
+  const { filament: data, refresh, isLoading } = useFilament();
   const [selectedRowId, setSelectedRowId] = useState("");
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -37,7 +38,7 @@ const FilamentPage = () => {
       headers: { Authorization: `Bearer ${bearerToken}` },
     });
     if (response.ok) {
-      await mutate();
+      await refresh();
       setSuccessMessage("Filament successfully deleted.");
       setTimeout(() => setSuccessMessage(""), 5000);
     } else {
@@ -95,12 +96,12 @@ const FilamentPage = () => {
         onClose={async (updateOccurred) => {
           if (updateOccurred) {
             setShowLoadingDialog(true);
-            await mutate();
+            await refresh();
           }
           setDrawerOpen(false);
           setShowLoadingDialog(false);
         }}
-        filamentId={selectedRowId}
+        filamentId={_.clone(selectedRowId)}
       />
 
       <ConfirmationDialog

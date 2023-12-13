@@ -1,10 +1,6 @@
-import { Grid, Stack, Tooltip } from "@mui/material";
-import SummaryCard from "../SummaryCard";
-import printImage from "../../images/3dprint.png";
+import { Card, Chip, Grid, Stack, Tooltip } from "@mui/material";
 import { useParams } from "react-router-dom";
-import IPrinter from "../../models/IPrinter";
 import { useEffect, useState } from "react";
-import ImageWithText from "../formelements/ImageWithText";
 import PieChartCard from "../PieChartCard";
 import { DefaultizedPieValueType, PieItemIdentifier } from "@mui/x-charts";
 import { DataGrid, GridActionsCellItem, GridColDef } from "@mui/x-data-grid";
@@ -18,9 +14,13 @@ import MessageBanner from "../MessageBanner";
 import useAPIToken from "../../hooks/use-api-token";
 import LoadingDialog from "../LoadingDialog";
 import { DatePicker } from "@mui/x-date-pickers";
-import { Dayjs } from "dayjs";
-import useFetch from "../../hooks/use-fetch";
+import dayjs, { Dayjs } from "dayjs";
 import ImageHoverZoom from "../ImageHoverZoom";
+import BarChartCard from "../BarChartCard";
+import usePrinters from "../../hooks/use-printers";
+
+const MAX_DATE = 9999999999999;
+const MIN_DATE = 0;
 
 const apiURL = `${process.env.REACT_APP_API_BASE_URL}printers/`;
 type IPrinterDashboardData = {
@@ -32,7 +32,8 @@ type IPrinterDashboardData = {
 
 const PrinterDashboard = () => {
   const { printerid } = useParams();
-  const { data, isLoading, mutate } = useFetch<IPrinter>(apiURL + printerid);
+  const { printers, isLoading, refresh } = usePrinters();
+  const data = printers?.filter((p) => p.id === printerid)[0];
   const [dashboardData, setDashboardData] = useState<IPrinterDashboardData>();
   const [printFilter, setPrintFilter] = useState("");
   const [showEditPrintDrawer, setShowEditPrintDrawer] = useState(false);
@@ -42,8 +43,8 @@ const PrinterDashboard = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const bearerToken = useAPIToken();
   const [showLoadingDialog, setShowLoadingDialog] = useState(false);
-  const [minDateFilter, setMinDateFilter] = useState<number>(0);
-  const [maxDateFilter, setMaxDateFilter] = useState<number>(9999999999999);
+  const [minDateFilter, setMinDateFilter] = useState<number>(MIN_DATE);
+  const [maxDateFilter, setMaxDateFilter] = useState<number>(MAX_DATE);
 
   useEffect(() => {
     if (data && !isLoading) {
@@ -99,7 +100,7 @@ const PrinterDashboard = () => {
       });
       if (response && response.ok) {
         setSuccessMessage("Print deleted successfully");
-        mutate();
+        refresh();
         setTimeout(() => setSuccessMessage(""), 5000);
         setShowLoadingDialog(false);
       } else {
@@ -176,99 +177,148 @@ const PrinterDashboard = () => {
           setErrorMessage("");
         }}
       ></MessageBanner>
-      <Grid container spacing={3} justifyContent="center">
+      <Grid container spacing={3} justifyContent="center" alignContent="center">
         {dashboardData && (
           <>
             <Grid item xs={12} md={4}>
               <PieChartCard
-                onClick={onPieChartClick}
-                slotProps={{ legend: { hidden: true } }}
-                series={[
-                  {
-                    data: [
-                      {
-                        id: 0,
-                        value: dashboardData.successCount,
-                        label: "Complete",
-                        color: "green",
+                pieChartProps={{
+                  height: 250,
+                  onClick: onPieChartClick,
+                  series: [
+                    {
+                      data: [
+                        {
+                          id: 0,
+                          value: dashboardData.successCount,
+                          label: "Complete",
+                          color: "green",
+                        },
+                        {
+                          id: 1,
+                          value: dashboardData.failureCount,
+                          label: "Failed",
+                          color: "red",
+                        },
+                        {
+                          id: 2,
+                          value: dashboardData.pendingCount,
+                          label: "Pending",
+                          color: "yellow",
+                        },
+                      ],
+                      highlightScope: { faded: "global", highlighted: "item" },
+                      faded: {
+                        innerRadius: 30,
+                        additionalRadius: -30,
+                        color: "gray",
                       },
-                      {
-                        id: 1,
-                        value: dashboardData.failureCount,
-                        label: "Failed",
-                        color: "red",
-                      },
-                      {
-                        id: 2,
-                        value: dashboardData.pendingCount,
-                        label: "Pending",
-                        color: "yellow",
-                      },
-                    ],
-                    highlightScope: { faded: "global", highlighted: "item" },
-                    faded: {
-                      innerRadius: 30,
-                      additionalRadius: -30,
-                      color: "gray",
+                    },
+                  ],
+                  slotProps: {
+                    legend: {
+                      direction: "column",
+                      position: { vertical: "middle", horizontal: "right" },
+                      padding: 0,
                     },
                   },
-                ]}
-                title="Success/Failure"
+                }}
+                title="Prints by Status"
+                height="90%"
               />
             </Grid>
             <Grid item xs={12} md={4}>
-              <SummaryCard
-                title="Successful Prints"
-                iconElement={
-                  <ImageWithText
-                    src={printImage}
-                    text={dashboardData.successCount.toString()}
-                    width={64}
-                    height={64}
-                  />
-                }
-              ></SummaryCard>
+              <BarChartCard
+                barCharProps={{
+                  height: 250,
+                  yAxis: [
+                    {
+                      data: [{ label: "Complete" }, "Failed", "Pending"],
+                    },
+                  ],
+                  xAxis: [
+                    {
+                      scaleType: "band",
+                      data: [
+                        "PolyMaker",
+                        "PrintBed",
+                        "No Filament Selected",
+                        "All Others",
+                      ],
+                    },
+                  ],
+                  series: [
+                    { data: [2, 3, 5, 3] },
+                    { data: [1, 6, 3, 2] },
+                    { data: [2, 5, 6, 2] },
+                  ],
+                }}
+                title="Prints by Filament"
+                height="90%"
+              ></BarChartCard>
             </Grid>
             <Grid item xs={12} md={4}>
-              <SummaryCard
-                title="Failed Prints"
-                iconElement={
-                  <ImageWithText
-                    src={printImage}
-                    text={dashboardData.failureCount.toString()}
-                    width={64}
-                    height={64}
-                  />
-                }
-              ></SummaryCard>
+              <Card sx={{ p: 3 }}>Prints by Filename coming</Card>
             </Grid>
           </>
         )}
         {data && (
           <>
-            <Grid item xs={12}>
+            <Grid item xs={6}>
               <Stack direction="row" display="flex" alignItems="center">
                 From
                 <DatePicker
                   sx={{ marginLeft: 2, marginRight: 2 }}
                   onChange={(v: Dayjs | null) =>
-                    setMinDateFilter(v ? v.unix() * 1000 : 0)
+                    setMinDateFilter(v ? v.unix() * 1000 : MIN_DATE)
                   }
                   slotProps={{
                     field: { clearable: true },
                   }}
+                  value={minDateFilter > MIN_DATE ? dayjs(minDateFilter) : null}
                 />
-                to{" "}
+                to
                 <DatePicker
                   sx={{ marginLeft: 2 }}
-                  onChange={(v: Dayjs | null) =>
-                    setMaxDateFilter(v ? v.unix() * 1000 : 9999999999999)
+                  onChange={
+                    (v: Dayjs | null) =>
+                      setMaxDateFilter(
+                        v ? v.unix() * 1000 + 86399999 : MAX_DATE
+                      ) //Adding a day's (-1) amount of milliseconds to that the filters include that date
                   }
                   slotProps={{
                     field: { clearable: true },
                   }}
+                  value={maxDateFilter < MAX_DATE ? dayjs(maxDateFilter) : null}
                 />
               </Stack>
+            </Grid>
+            <Grid item xs={6}>
+              {minDateFilter > 0 && (
+                <Chip
+                  label={`Inserted after ${new Date(
+                    minDateFilter
+                  ).toLocaleDateString()}`}
+                  onDelete={() => setMinDateFilter(0)}
+                  sx={{ marginRight: 1 }}
+                />
+              )}
+              {maxDateFilter < MAX_DATE && (
+                <Chip
+                  label={`Inserted before ${new Date(
+                    maxDateFilter
+                  ).toLocaleDateString()}`}
+                  onDelete={() => setMaxDateFilter(MAX_DATE)}
+                  sx={{ marginRight: 1 }}
+                />
+              )}
+              {printFilter && (
+                <Chip
+                  label={"Status: " + printFilter}
+                  onDelete={() => setPrintFilter("")}
+                  sx={{ marginRight: 1 }}
+                />
+              )}
             </Grid>
             <DataGrid
               rows={data.prints.filter((p) => {
@@ -283,6 +333,9 @@ const PrinterDashboard = () => {
                 pagination: {
                   paginationModel: { page: 0, pageSize: 10 },
                 },
+                sorting: {
+                  sortModel: [{ field: "insertedAt", sort: "desc" }],
+                },
               }}
               pageSizeOptions={[10, 50, 100]}
               sx={{ marginTop: 2, marginLeft: 3 }}
@@ -296,7 +349,7 @@ const PrinterDashboard = () => {
           printerId={data?.id}
           print={selectedPrint}
           onClose={(didUpdate) => {
-            if (didUpdate) mutate();
+            if (didUpdate) refresh();
             setShowEditPrintDrawer(false);
           }}
         ></EditPrintDrawer>
