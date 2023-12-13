@@ -8,12 +8,10 @@ import ShrunkTextField from "../formelements/ShrunkTextField";
 import IPrint, { Status, getDefaultPrint } from "../../models/IPrint";
 import IPrinter from "../../models/IPrinter";
 import StyledSelect from "../formelements/StyledSelect";
-import IFilament from "../../models/IFilament";
 import { v4 as uuidv4 } from "uuid";
-import useFetch from "../../hooks/use-fetch";
+import useFilament from "../../hooks/use-filament";
 
 const printerApiURL = `${process.env.REACT_APP_API_BASE_URL}printers`;
-const filamentApiURL = `${process.env.REACT_APP_API_BASE_URL}filament`;
 
 const EditPrintDrawer = (
   props: PropsWithChildren<{
@@ -29,8 +27,7 @@ const EditPrintDrawer = (
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const bearerToken = useAPIToken();
-  const { data: filament, isLoading: filamentLoading } =
-    useFetch<IFilament[]>(filamentApiURL);
+  const { filament, isLoading: filamentLoading } = useFilament();
 
   useEffect(() => {
     if (props.print) {
@@ -147,29 +144,33 @@ const EditPrintDrawer = (
             value={print.amountUsed}
             onChange={(e) => onChangeAmount(e.target.value)}
           />
-          <StyledSelect
-            id="printer-filament"
-            label="Filament"
-            value={print.filamentId}
-            onChange={(e) => onChangeFilament(e.target.value as string)}
-          >
-            {!filamentLoading &&
-              filament
-                ?.sort(
-                  (a, b) =>
-                    a.type.localeCompare(b.type) ||
-                    a.brand.localeCompare(b.brand) ||
-                    a.name.localeCompare(b.name) ||
-                    a.color.localeCompare(b.color)
-                )
-                .map((f) => {
-                  return (
-                    <MenuItem key={f.id} value={f.id}>
-                      {f.type && `(${f.type})`} {f.brand} - {f.name} - {f.color}
-                    </MenuItem>
-                  );
-                })}
-          </StyledSelect>
+          {filament && (
+            <StyledSelect
+              id="printer-filament"
+              label="Filament"
+              value={print.filamentId}
+              onChange={(e) => onChangeFilament(e.target.value as string)}
+            >
+              {!filamentLoading &&
+                filament &&
+                filament
+                  ?.sort(
+                    (a, b) =>
+                      a.type.localeCompare(b.type) ||
+                      a.brand.localeCompare(b.brand) ||
+                      a.name.localeCompare(b.name) ||
+                      a.color.localeCompare(b.color)
+                  )
+                  .map((f) => {
+                    return (
+                      <MenuItem key={f.id} value={f.id}>
+                        {f.type && `(${f.type})`} {f.brand} - {f.name} -{" "}
+                        {f.color}
+                      </MenuItem>
+                    );
+                  })}
+            </StyledSelect>
+          )}
           <ShrunkTextField
             id="duration"
             label="Duration (secs)"

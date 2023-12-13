@@ -8,6 +8,7 @@ import { useDarkMode } from "usehooks-ts";
 import { Container } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import CacheProvider from "./hooks/use-cache";
 
 function App() {
   const { isDarkMode } = useDarkMode();
@@ -21,15 +22,17 @@ function App() {
     <>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <ThemeProvider theme={theme}>
-          <CssBaseline />
-          <Header />
+          <CacheProvider>
+            <CssBaseline />
+            <Header />
 
-          <Container>
-            <Outlet />
-            <div style={{ marginTop: 60 }}></div>
-          </Container>
+            <Container>
+              <Outlet />
+              <div style={{ marginTop: 60 }}></div>
+            </Container>
 
-          <Footer />
+            <Footer />
+          </CacheProvider>
         </ThemeProvider>
       </LocalizationProvider>
     </>
