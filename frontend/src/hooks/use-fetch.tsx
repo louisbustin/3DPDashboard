@@ -3,7 +3,7 @@ import useAPIToken from "./use-api-token";
 import { v4 as uuidv4 } from "uuid";
 import _ from "lodash";
 
-type FetchResponse<T> = {
+export type FetchResponse<T> = {
   data?: T;
   isLoading: boolean;
   refresh: () => void;

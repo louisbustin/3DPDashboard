@@ -1,11 +1,12 @@
 export type Status = "Pending" | "Cancelled" | "Complete" | "Active" | "Failed";
 
 export default interface IPrint {
-  id: string;
+  printerId: string;
   filamentId: string;
   amountUsed: number;
-  status: Status;
+  PrintStatus: Status;
   insertedAt: number;
+  updatedAt: number;
   Progress?: number;
   EventType?: number;
   FileName?: string;
@@ -22,10 +23,11 @@ export default interface IPrint {
 
 export const getDefaultPrint = (): IPrint => {
   return {
-    id: "",
+    printerId: "",
     filamentId: "",
     amountUsed: 0,
-    status: "Pending",
+    PrintStatus: "Pending",
     insertedAt: 0,
+    updatedAt: 0,
   };
 };
