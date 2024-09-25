@@ -6,17 +6,15 @@ import LoadingDialog from "../LoadingDialog";
 import MessageBanner from "../MessageBanner";
 import ShrunkTextField from "../formelements/ShrunkTextField";
 import IPrint, { Status, getDefaultPrint } from "../../models/IPrint";
-import IPrinter from "../../models/IPrinter";
 import StyledSelect from "../formelements/StyledSelect";
-import { v4 as uuidv4 } from "uuid";
 import useFilament from "../../hooks/use-filament";
 
-const printerApiURL = `${process.env.REACT_APP_API_BASE_URL}printers`;
+const printApiURL = `${process.env.REACT_APP_API_BASE_URL}printers`;
 
 const EditPrintDrawer = (
   props: PropsWithChildren<{
     open: boolean;
-    onClose?: (updateOccurred?: boolean) => void;
+    onClose?: (updateOccurred?: boolean, print?: IPrint) => void;
     printerId: string;
     print?: IPrint;
   }>
@@ -48,60 +46,33 @@ const EditPrintDrawer = (
   };
   const onChangeStatus = (status: Status) => {
     setPrint((f) => {
-      return { ...f, status };
+      return { ...f, PrintStatus: status };
     });
   };
   const onChangeDuration = (durationSec: number) => {
     setPrint((f) => {
-      return { ...f, DurationSecs: durationSec };
+      return { ...f, DurationSec: durationSec };
     });
   };
   const handleClose = (updateOccurred: boolean) => {
-    if (props.onClose) props.onClose(updateOccurred);
+    if (props.onClose) props.onClose(updateOccurred, updateOccurred ? print : undefined);
     //clear out any saved filaments when we close the dialog
     setPrint(getDefaultPrint());
   };
 
   const savePrint = async () => {
     setIsLoading(true);
-
-    //pull updated printer first
-    const printerUrl = printerApiURL + "/" + props.printerId;
-
-    const printerGetResponse = await fetch(printerUrl, {
-      method: "GET",
+    const response = await fetch(`${printApiURL}/${print.printerId}/prints`, {
+      method: "POST",
+      body: JSON.stringify(print),
       headers: { Authorization: `Bearer ${bearerToken}` },
     });
-    if (printerGetResponse.ok) {
-      const p = (await printerGetResponse.json()) as IPrinter;
-      if (p.prints) {
-        const printIndex = p.prints.findIndex((pr) => {
-          return pr.id === print.id;
-        });
-        if (printIndex >= 0) {
-          p.prints[printIndex] = { ...p.prints[printIndex], ...print };
-        } else {
-          print.id = uuidv4();
-          p.prints.push(print);
-        }
-      } else {
-        p.prints = [print];
-      }
-
-      const response = await fetch(printerApiURL, {
-        method: "POST",
-        body: JSON.stringify(p),
-        headers: { Authorization: `Bearer ${bearerToken}` },
-      });
-      if (response.ok) {
-        setSuccessMessage("Print created successfully.");
-        handleClose(true);
-        setTimeout(() => setSuccessMessage(""), 5000);
-      } else {
-        setErrorMessage(`Creation failed with message: ${response.statusText}`);
-      }
+    if (response.ok) {
+      setSuccessMessage("Print updated successfully.");
+      handleClose(true);
+      setTimeout(() => setSuccessMessage(""), 5000);
     } else {
-      setErrorMessage("Creation failed - cannot get current printer");
+      setErrorMessage(`Update failed with message: ${response.statusText}`);
     }
     setIsLoading(false);
   };
@@ -124,11 +95,11 @@ const EditPrintDrawer = (
         hideDeleteButton={true}
       >
         <Stack spacing={2}>
-          <h2>{props.print?.id ? "Edit" : "New"} Print</h2>
+          <h2>{props.print?.PrintId ? "Edit" : "New"} Print</h2>
           <StyledSelect
             id="print-status"
             label="Status"
-            value={print.status}
+            value={print.PrintStatus}
             onChange={(e) => onChangeStatus(e.target.value as Status)}
           >
             <MenuItem value="Complete">Complete</MenuItem>

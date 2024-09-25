@@ -1,12 +1,13 @@
 {
   "name": "logprint",
   "version": "1.0.0",
-  "description": "Logging prints as webhook from octoeverywhere",
+  "description": "Endpoints to facilitate logging from Octoeverywhere",
   "main": "app.js",
   "repository": "",
   "author": "eForge.us",
   "license": "MIT",
   "dependencies": {
-    "axios": ">=0.21.1"
+    "axios": ">=0.21.1",
+    "uuid": "^9.0.1"
   }
 }

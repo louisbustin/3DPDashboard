@@ -18,6 +18,7 @@ import dayjs, { Dayjs } from "dayjs";
 import ImageHoverZoom from "../ImageHoverZoom";
 import BarChartCard from "../BarChartCard";
 import usePrinters from "../../hooks/use-printers";
+import { IPrintLastEvaluatedKey } from "../../models/IPrintResponse";
 
 const MAX_DATE = 9999999999999;
 const MIN_DATE = 0;
@@ -30,9 +31,11 @@ type IPrinterDashboardData = {
   pendingCount: number;
 };
 
+
+
 const PrinterDashboard = () => {
   const { printerid } = useParams();
-  const { printers, isLoading, refresh } = usePrinters();
+  const { printers, isLoading } = usePrinters();
   const data = printers?.filter((p) => p.id === printerid)[0];
   const [dashboardData, setDashboardData] = useState<IPrinterDashboardData>();
   const [printFilter, setPrintFilter] = useState("");
@@ -45,6 +48,41 @@ const PrinterDashboard = () => {
   const [showLoadingDialog, setShowLoadingDialog] = useState(false);
   const [minDateFilter, setMinDateFilter] = useState<number>(MIN_DATE);
   const [maxDateFilter, setMaxDateFilter] = useState<number>(MAX_DATE);
+  const [prints, setPrints] = useState<IPrint[]>([]);
+
+  useEffect(() => {
+
+    const getPrintsByPrinter = async (printerId?: string) => {
+      setShowLoadingDialog(true);
+      let evalKey: IPrintLastEvaluatedKey | undefined = undefined;
+      let accumulatedPrints: IPrint[] = [];
+      let p;
+
+      let response;
+      do {
+
+        response = await fetch(apiURL + printerId + "/prints" + (evalKey ? `?LastEvaluatedKey=${JSON.stringify(evalKey)}` : ""), {
+          headers: {
+            Authorization: `Bearer ${bearerToken}`,
+          },
+        });
+
+        p = await response.json();
+
+        if (p.data) {
+          accumulatedPrints = accumulatedPrints.concat(p.data);
+        }
+        evalKey = { ...p.LastEvaluatedKey};
+      } while (p.LastEvaluatedKey);
+      setPrints([...accumulatedPrints]);
+      setShowLoadingDialog(false);
+    }
+
+    if (bearerToken) {
+      getPrintsByPrinter(printerid);
+    }
+  }, [bearerToken, printerid]);
+
 
   useEffect(() => {
     if (data && !isLoading) {
@@ -54,9 +92,9 @@ const PrinterDashboard = () => {
         totalCount: 0,
         pendingCount: 0,
       };
-      data.prints.forEach((print) => {
+      prints.forEach((print) => {
         printData.totalCount++;
-        switch (print.status) {
+        switch (print.PrintStatus) {
           case "Complete":
             printData.successCount++;
             break;
@@ -70,8 +108,8 @@ const PrinterDashboard = () => {
       });
       setDashboardData(printData);
     }
-  }, [data, isLoading]);
-
+  },
+  [data, isLoading, prints]);
   const onPieChartClick = (
     event: React.MouseEvent<SVGPathElement, MouseEvent>,
     itemIdentifier: PieItemIdentifier,
@@ -86,27 +124,8 @@ const PrinterDashboard = () => {
 
   const deletePrint = async () => {
     //remove a print from the printer prints array and POST back to save
-    if (data) {
-      setShowLoadingDialog(true);
-      setShowDeletePrintDialog(false);
-      const printerToSave = { ...data };
-      printerToSave.prints = printerToSave.prints.filter(
-        (print) => print.id !== selectedPrint.id
-      );
-      const response = await fetch(apiURL, {
-        method: "POST",
-        body: JSON.stringify(printerToSave),
-        headers: { Authorization: `Bearer ${bearerToken}` },
-      });
-      if (response && response.ok) {
-        setSuccessMessage("Print deleted successfully");
-        refresh();
-        setTimeout(() => setSuccessMessage(""), 5000);
-        setShowLoadingDialog(false);
-      } else {
-        setErrorMessage("Error deleting print");
-      }
-    }
+    //TODO make delete of a print happen
+
   };
   const columns: GridColDef<IPrint>[] = [
     {
@@ -120,7 +139,7 @@ const PrinterDashboard = () => {
           ></ImageHoverZoom>
         ),
     },
-    { field: "status", headerName: "Status", flex: 1 },
+    { field: "PrintStatus", headerName: "Status", flex: 1 },
     { field: "FileName", headerName: "File Name", flex: 1 },
     { field: "DurationSec", headerName: "Duration (secs)", flex: 1 },
     { field: "amountUsed", headerName: "Amount Used", flex: 1 },
@@ -321,9 +340,9 @@ const PrinterDashboard = () => {
               )}
             </Grid>
             <DataGrid
-              rows={data.prints.filter((p) => {
+              rows={prints.filter((p) => {
                 return (
-                  (printFilter === "" || p.status === printFilter) &&
+                  (printFilter === "" || p.PrintStatus === printFilter) &&
                   minDateFilter <= p.insertedAt &&
                   p.insertedAt <= maxDateFilter
                 );
@@ -339,6 +358,7 @@ const PrinterDashboard = () => {
               }}
               pageSizeOptions={[10, 50, 100]}
               sx={{ marginTop: 2, marginLeft: 3 }}
+              autoHeight
             />
           </>
         )}
@@ -348,8 +368,18 @@ const PrinterDashboard = () => {
           open={showEditPrintDrawer}
           printerId={data?.id}
           print={selectedPrint}
-          onClose={(didUpdate) => {
-            if (didUpdate) refresh();
+          onClose={(didUpdate, updatedPrint) => {
+           if (updatedPrint) {
+            setPrints((prints) => {
+              for (let i = 0; i < prints.length; i++) {
+                if (prints[i].insertedAt === updatedPrint.insertedAt) {
+                  prints[i] = updatedPrint;
+                  break;
+                }
+              }
+              return [...prints];
+            })
+           }
             setShowEditPrintDrawer(false);
           }}
         ></EditPrintDrawer>

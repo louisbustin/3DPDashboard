@@ -112,7 +112,7 @@ Resources:
   PrintersGET:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      CodeUri: printers/GET/
+      CodeUri: printers
       Handler: app.lambdaHandler
       Runtime: nodejs18.x
       Architectures:
@@ -128,7 +128,7 @@ Resources:
   PrintersPOST:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: printers/POST/
+      CodeUri: printers
       Handler: app.lambdaHandler
       Runtime: nodejs18.x
       Architectures:
@@ -144,7 +144,7 @@ Resources:
   PrintersOPTIONS:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: printers/OPTIONS/
+      CodeUri: printers
       Handler: app.lambdaHandler
       Runtime: nodejs18.x
       Architectures:
@@ -158,7 +158,7 @@ Resources:
   PrintersByIdGET:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: printers/byid/GET
+      CodeUri: printers
       Handler: app.lambdaHandler
       Runtime: nodejs18.x
       Architectures:
@@ -174,7 +174,7 @@ Resources:
   PrintersByIdOPTIONS:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: printers/byid/OPTIONS
+      CodeUri: printers
       Handler: app.lambdaHandler
       Runtime: nodejs18.x
       Architectures:
@@ -190,7 +190,7 @@ Resources:
   PrintersByIdDELETE:
     Type: AWS::Serverless::Function 
     Properties:
-      CodeUri: printers/byid/DELETE
+      CodeUri: printers
       Handler: app.lambdaHandler
       Runtime: nodejs18.x
       Architectures:
@@ -203,6 +203,54 @@ Resources:
           Properties:
             Path: /printers/{id}
             Method: delete
+  PrintersByIdPrintsGET:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: printers
+      Handler: app.lambdaHandler
+      Runtime: nodejs18.x
+      Architectures:
+        - x86_64
+      Policies:
+      - AmazonDynamoDBFullAccess
+      Events:
+        Printers:
+          Type: Api
+          Properties:
+            Path: /printers/{id}/prints
+            Method: get
+  PrintersByIdPrintsPOST:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: printers
+      Handler: app.lambdaHandler
+      Runtime: nodejs18.x
+      Architectures:
+        - x86_64
+      Policies:
+      - AmazonDynamoDBFullAccess
+      Events:
+        Printers:
+          Type: Api
+          Properties:
+            Path: /printers/{id}/prints
+            Method: post            
+  PrintersByIdPrintsOPTIONS:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: printers
+      Handler: app.lambdaHandler
+      Runtime: nodejs18.x
+      Architectures:
+        - x86_64
+      Policies:
+      - AmazonDynamoDBFullAccess
+      Events:
+        Printers:
+          Type: Api 
+          Properties:
+            Path: /printers/{id}/prints
+            Method: options    
   DashboardGET:
     Type: AWS::Serverless::Function
     Properties:
@@ -238,7 +286,7 @@ Resources:
   LogPrintPOST:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: logprint/POST
+      CodeUri: logprint
       Handler: app.lambdaHandler
       Runtime: nodejs18.x
       Architectures:
@@ -254,7 +302,7 @@ Resources:
   LogPrintOPTIONS:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: logprint/OPTIONS
+      CodeUri: logprint
       Handler: app.lambdaHandler
       Runtime: nodejs18.x
       Architectures:
