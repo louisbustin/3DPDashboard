@@ -61,7 +61,7 @@ const PrinterDashboard = () => {
       let response;
       do {
 
-        response = await fetch(apiURL + printerId + "/prints" + (evalKey ? `?LastEvaluatedKey=${JSON.stringify(evalKey)}` : ""), {
+        response = await fetch(apiURL + printerId + "/prints" + (evalKey ? `?LastEvaluatedKey=${encodeURIComponent(JSON.stringify(evalKey))}` : ""), {
           headers: {
             Authorization: `Bearer ${bearerToken}`,
           },
@@ -359,6 +359,7 @@ const PrinterDashboard = () => {
               pageSizeOptions={[10, 50, 100]}
               sx={{ marginTop: 2, marginLeft: 3 }}
               autoHeight
+              getRowId={(row) => row.insertedAt}
             />
           </>
         )}
