@@ -198,7 +198,7 @@ const getPrintsByPrinterIdPostResponse = async (printDetails) => {
 export const lambdaHandler = async (event, context) => {
   try {
     const httpMethod = event.httpMethod;
-    const path = event.requestContext.path;
+    const path = event.requestContext.resourcePath;
     //if the method is OPTIONS, regardless of path, always return the options headers
     if (httpMethod === "OPTIONS") {
       return getOptionsReponse();
