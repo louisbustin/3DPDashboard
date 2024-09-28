@@ -78,6 +78,7 @@ const getPostResponse = async (event) => {
       filamentId: printResultJson.filamentId ? printResultJson.filamentId : "",
       amountUsed: printResultJson.amountUsed ? printResultJson.amountUsed : 0,
       PrintStatus: newStatus,
+      usersub: printerJson.usersub,
       updatedAt: Date.now(),
       ...requestJSON,
     }

@@ -123,9 +123,8 @@ const PrinterDashboard = () => {
   };
 
   const deletePrint = async () => {
-    //remove a print from the printer prints array and POST back to save
     //TODO make delete of a print happen
-
+    
   };
   const columns: GridColDef<IPrint>[] = [
     {

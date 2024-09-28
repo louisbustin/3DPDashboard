@@ -1,5 +1,5 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, PutCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
+import { DeleteCommand, DynamoDBDocumentClient, PutCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
 import jsonwebtoken from "jsonwebtoken";
 
 const getUserInfo = async (authToken) => {
@@ -144,13 +144,13 @@ const getPrintersbyIdDeleteResponse = async (user, printerId) => {
   };
 }
 
+// GET /printers/{id}/prints
 const getPrintsByPrinterIdGetResponse = async (user, printerId, ExclusiveStartKey) => {
 
   //query printers table to get octoEverywhereId
   const printer = await getPrintersByIdGetResponse(user, printerId);
 
   if (printer) {
-    console.log("printerId", printerId);
     const command = new QueryCommand({
       TableName: printsTableName,
       KeyConditionExpression: "printerId = :printerid",
@@ -163,6 +163,9 @@ const getPrintsByPrinterIdGetResponse = async (user, printerId, ExclusiveStartKe
     });
 
     const response = await dynamo.send(command);
+
+    //remove the usersub from going over the wire to the client
+    response.Items.forEach((i) => delete i.usersub);
 
     return {
       statusCode: 200,
@@ -195,6 +198,20 @@ const getPrintsByPrinterIdPostResponse = async (printDetails) => {
   };
 }
 
+// GET /printers/{id}/prints/{printid}
+const getPrintsByIdByPrinterIdGetResponse = (user, printerId, printId) => {
+  return getMethodNotFoundResponse();
+}
+
+// DELETE /printers/{id}/prints/{printid}
+const getPrintsByIdByPrinterIdDeleteResponse = (user, printerId, printId) => {
+  const command = new DeleteCommand({
+    TableName: "3dpdashboard_prints",
+    KeyConditionExpression: ""
+  });
+}
+
+
 export const lambdaHandler = async (event, context) => {
   try {
     const httpMethod = event.httpMethod;
@@ -222,6 +239,7 @@ export const lambdaHandler = async (event, context) => {
       //no other methods are available for this path, return a 405 method not found
       return getMethodNotFoundResponse();
     }
+
     //the /printers/{id} endpoints
     if (path === "/printers/{id}" || path === "/printers/{id}/") {
       if (httpMethod === "GET") {
@@ -249,6 +267,20 @@ export const lambdaHandler = async (event, context) => {
       //no other methods are available for this path, return a 405 method not found
       return getMethodNotFoundResponse();
     }
+
+    //the /printers/{id}/prints/{printid} endpoints
+    if (path === "/printers/{id}/prints/{printid}" || path === "/printers/{id}/prints/{printid}/") {
+      if (httpMethod === "GET") {
+        return getPrintsByIdByPrinterIdGetResponse(user, event.pathParameters.id, event.pathParameters.printid);
+      }
+
+      if (httpMethod === "DELETE") {
+        return getPrintsByIdByPrinterIdDeleteResponse(user, event.pathParameters.id, event.pathParameters.printid);
+      }
+      
+      //no other methods are available for this path, return a 405 method not found
+      return getMethodNotFoundResponse();
+    }    
 
   } catch (err) {
     console.log(err);
