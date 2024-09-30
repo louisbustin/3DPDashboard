@@ -31,8 +31,6 @@ type IPrinterDashboardData = {
   pendingCount: number;
 };
 
-
-
 const PrinterDashboard = () => {
   const { printerid } = useParams();
   const { printers, isLoading } = usePrinters();
@@ -51,7 +49,6 @@ const PrinterDashboard = () => {
   const [prints, setPrints] = useState<IPrint[]>([]);
 
   useEffect(() => {
-
     const getPrintsByPrinter = async (printerId?: string) => {
       setShowLoadingDialog(true);
       let evalKey: IPrintLastEvaluatedKey | undefined = undefined;
@@ -60,29 +57,37 @@ const PrinterDashboard = () => {
 
       let response;
       do {
-
-        response = await fetch(apiURL + printerId + "/prints" + (evalKey ? `?LastEvaluatedKey=${encodeURIComponent(JSON.stringify(evalKey))}` : ""), {
-          headers: {
-            Authorization: `Bearer ${bearerToken}`,
-          },
-        });
+        response = await fetch(
+          apiURL +
+            printerId +
+            "/prints" +
+            (evalKey
+              ? `?LastEvaluatedKey=${encodeURIComponent(
+                  JSON.stringify(evalKey)
+                )}`
+              : ""),
+          {
+            headers: {
+              Authorization: `Bearer ${bearerToken}`,
+            },
+          }
+        );
 
         p = await response.json();
 
         if (p.data) {
           accumulatedPrints = accumulatedPrints.concat(p.data);
         }
-        evalKey = { ...p.LastEvaluatedKey};
+        evalKey = { ...p.LastEvaluatedKey };
       } while (p.LastEvaluatedKey);
       setPrints([...accumulatedPrints]);
       setShowLoadingDialog(false);
-    }
+    };
 
     if (bearerToken) {
       getPrintsByPrinter(printerid);
     }
   }, [bearerToken, printerid]);
-
 
   useEffect(() => {
     if (data && !isLoading) {
@@ -108,8 +113,7 @@ const PrinterDashboard = () => {
       });
       setDashboardData(printData);
     }
-  },
-  [data, isLoading, prints]);
+  }, [data, isLoading, prints]);
   const onPieChartClick = (
     event: React.MouseEvent<SVGPathElement, MouseEvent>,
     itemIdentifier: PieItemIdentifier,
@@ -123,8 +127,29 @@ const PrinterDashboard = () => {
   };
 
   const deletePrint = async () => {
-    //TODO make delete of a print happen
-    
+    //selected print should be the one we want deleted
+    const response = await fetch(
+      `${apiURL}${selectedPrint.printerId}/prints/${selectedPrint.insertedAt}`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${bearerToken}`,
+        },
+      }
+    );
+    if (response && response.ok) {
+      setPrints((printArray) => {
+        const newArray = printArray.filter(
+          (p) => p.insertedAt !== selectedPrint.insertedAt
+        );
+        return [...newArray];
+      });
+      setShowDeletePrintDialog(false);
+      setSuccessMessage("Delete of print successful.");
+    } else {
+      setErrorMessage("Delete was not successful.");
+      setShowDeletePrintDialog(false);
+    }
   };
   const columns: GridColDef<IPrint>[] = [
     {
@@ -369,17 +394,17 @@ const PrinterDashboard = () => {
           printerId={data?.id}
           print={selectedPrint}
           onClose={(didUpdate, updatedPrint) => {
-           if (updatedPrint) {
-            setPrints((prints) => {
-              for (let i = 0; i < prints.length; i++) {
-                if (prints[i].insertedAt === updatedPrint.insertedAt) {
-                  prints[i] = updatedPrint;
-                  break;
+            if (updatedPrint) {
+              setPrints((prints) => {
+                for (let i = 0; i < prints.length; i++) {
+                  if (prints[i].insertedAt === updatedPrint.insertedAt) {
+                    prints[i] = updatedPrint;
+                    break;
+                  }
                 }
-              }
-              return [...prints];
-            })
-           }
+                return [...prints];
+              });
+            }
             setShowEditPrintDrawer(false);
           }}
         ></EditPrintDrawer>
