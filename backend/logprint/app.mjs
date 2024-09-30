@@ -1,4 +1,8 @@
-import { DynamoDBClient, QueryCommand, ScanCommand } from "@aws-sdk/client-dynamodb";
+import {
+  DynamoDBClient,
+  QueryCommand,
+  ScanCommand,
+} from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
 import { unmarshall } from "@aws-sdk/util-dynamodb";
 
@@ -16,16 +20,16 @@ const getOptionsReponse = () => {
       "Access-Control-Allow-Methods": "POST",
       "Access-Control-Allow-Headers": "*",
     },
-  }
-}
+  };
+};
 
 const getMethodNotFoundResponse = () => {
   return {
     statusCode: 405,
     headers: allowOriginHeaders,
     body: "method not found",
-  }
-}
+  };
+};
 
 const getPostResponse = async (event) => {
   const requestJSON = JSON.parse(event.body);
@@ -63,25 +67,26 @@ const getPostResponse = async (event) => {
     }
 
     const newStatus =
-    requestJSON.EventType === 2
-      ? "Complete"
-      : requestJSON.EventType === 3
-      ? "Failed"
-      : "Pending";
-
+      requestJSON.EventType === 2
+        ? "Complete"
+        : requestJSON.EventType === 3
+        ? "Failed"
+        : "Pending";
 
     //if the print exists, this will replace the original. If it does not, it is created.
     //this ensures the prints table always has the most recent info from the octoeverywhere
     const newPrint = {
       printerId: printerJson.id,
-      insertedAt: printResultJson.insertedAt ? printResultJson.insertedAt : Date.now(),
+      insertedAt: printResultJson.insertedAt
+        ? printResultJson.insertedAt
+        : Date.now(),
       filamentId: printResultJson.filamentId ? printResultJson.filamentId : "",
       amountUsed: printResultJson.amountUsed ? printResultJson.amountUsed : 0,
       PrintStatus: newStatus,
       usersub: printerJson.usersub,
       updatedAt: Date.now(),
       ...requestJSON,
-    }
+    };
 
     await dynamo.send(
       new PutCommand({
@@ -89,8 +94,7 @@ const getPostResponse = async (event) => {
         Item: newPrint,
       })
     );
-     
-    
+
     //log the full request from octoeverywhere
     await dynamo.send(
       new PutCommand({
@@ -108,8 +112,7 @@ const getPostResponse = async (event) => {
     },
     body: "ok",
   };
-  
-}
+};
 
 export const lambdaHandler = async (event, context) => {
   //This method log prints as a webhook from octoeverywhere
@@ -122,12 +125,11 @@ export const lambdaHandler = async (event, context) => {
     }
 
     if (httpMethod === "POST") {
-      return await getPostResponse(event);   
+      return await getPostResponse(event);
     }
 
     //if to this point, no other methods are implemented. return a 405
     return getMethodNotFoundResponse();
-
   } catch (err) {
     console.log(err);
     return {

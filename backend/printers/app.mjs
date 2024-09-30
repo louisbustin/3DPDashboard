@@ -1,13 +1,18 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DeleteCommand, DynamoDBDocumentClient, PutCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
+import {
+  DeleteCommand,
+  DynamoDBDocumentClient,
+  PutCommand,
+  QueryCommand,
+} from "@aws-sdk/lib-dynamodb";
 import jsonwebtoken from "jsonwebtoken";
+import { marshall } from "@aws-sdk/util-dynamodb";
 
 const getUserInfo = async (authToken) => {
   if (authToken) {
     return jsonwebtoken.decode(authToken.replace("Bearer ", ""));
   }
   return null;
-
 };
 
 const client = new DynamoDBClient({});
@@ -26,16 +31,16 @@ const getOptionsReponse = () => {
       "Access-Control-Allow-Methods": "GET,POST,DELETE",
       "Access-Control-Allow-Headers": "Authorization",
     },
-  }
-}
+  };
+};
 
 const getMethodNotFoundResponse = () => {
   return {
     statusCode: 405,
     headers: allowOriginHeaders,
     body: "method not found",
-  }
-}
+  };
+};
 
 const getPrintersGetResponse = async (user) => {
   const command = new QueryCommand({
@@ -56,7 +61,7 @@ const getPrintersGetResponse = async (user) => {
     headers: allowOriginHeaders,
     body: JSON.stringify(response.Items),
   };
-}
+};
 
 const getPrintersPostReponse = async (user, requestBody) => {
   const requestJSON = JSON.parse(requestBody);
@@ -81,7 +86,7 @@ const getPrintersPostReponse = async (user, requestBody) => {
       id: itemId,
     }),
   };
-}
+};
 
 const getPrintersByIdGetResponse = async (user, printerId) => {
   const command = new QueryCommand({
@@ -104,10 +109,9 @@ const getPrintersByIdGetResponse = async (user, printerId) => {
     headers: allowOriginHeaders,
     body: JSON.stringify(response.Items[0]),
   };
-}
+};
 
 const getPrintersbyIdDeleteResponse = async (user, printerId) => {
-
   //first, we must verify this filament is owned by this user
   const queryCommand = new QueryCommand({
     TableName: printersTableName,
@@ -142,11 +146,14 @@ const getPrintersbyIdDeleteResponse = async (user, printerId) => {
     statusCode: 204,
     headers: allowOriginHeaders,
   };
-}
+};
 
 // GET /printers/{id}/prints
-const getPrintsByPrinterIdGetResponse = async (user, printerId, ExclusiveStartKey) => {
-
+const getPrintsByPrinterIdGetResponse = async (
+  user,
+  printerId,
+  ExclusiveStartKey
+) => {
   //query printers table to get octoEverywhereId
   const printer = await getPrintersByIdGetResponse(user, printerId);
 
@@ -170,20 +177,21 @@ const getPrintsByPrinterIdGetResponse = async (user, printerId, ExclusiveStartKe
     return {
       statusCode: 200,
       headers: allowOriginHeaders,
-      body: JSON.stringify({LastEvaluatedKey: response.LastEvaluatedKey, data: response.Items}),
+      body: JSON.stringify({
+        LastEvaluatedKey: response.LastEvaluatedKey,
+        data: response.Items,
+      }),
     };
-
   } else {
     return {
       statusCode: 404,
       headers: allowOriginHeaders,
       body: "not found",
-    }
+    };
   }
-}
+};
 
 const getPrintsByPrinterIdPostResponse = async (printDetails) => {
-  
   const command = new PutCommand({
     TableName: "3dpdashboard_prints",
     Item: JSON.parse(printDetails),
@@ -196,7 +204,36 @@ const getPrintsByPrinterIdPostResponse = async (printDetails) => {
     headers: allowOriginHeaders,
     body: "ok",
   };
-}
+};
+
+// GET /printers/{id}/prints/{printid}
+const getPrintsByIdByPrinterIdGetResponse = (user, printerId, printId) => {
+  return getMethodNotFoundResponse();
+};
+
+// DELETE /printers/{id}/prints/{printid}
+const getPrintsByIdByPrinterIdDeleteResponse = async (
+  user,
+  printerId,
+  insertedAt
+) => {
+  const key = {
+    printerId: printerId,
+    insertedAt: Number(insertedAt),
+  };
+
+  const command = new DeleteCommand({
+    TableName: "3dpdashboard_prints",
+    Key: key,
+  });
+
+  const result = await dynamo.send(command);
+
+  return {
+    statusCode: 204,
+    headers: allowOriginHeaders,
+  };
+};
 
 // GET /printers/{id}/prints/{printid}
 const getPrintsByIdByPrinterIdGetResponse = (user, printerId, printId) => {
@@ -244,44 +281,60 @@ export const lambdaHandler = async (event, context) => {
     if (path === "/printers/{id}" || path === "/printers/{id}/") {
       if (httpMethod === "GET") {
         return getPrintersByIdGetResponse(user, event.pathParameters.id);
-      } 
-      
+      }
+
       if (httpMethod === "DELETE") {
-        return getPrintersbyIdDeleteResponse(user, event.pathParameters.id)
+        return getPrintersbyIdDeleteResponse(user, event.pathParameters.id);
       }
       //no other methods are available for this path, return a 405 method not found
       return getMethodNotFoundResponse();
     }
 
-
     //the /printers/{id}/prints endpoints
     if (path === "/printers/{id}/prints" || path === "/printers/{id}/prints/") {
       if (httpMethod === "GET") {
-        return getPrintsByPrinterIdGetResponse(user, event.pathParameters.id, event.queryStringParameters?.LastEvaluatedKey ? JSON.parse(event.queryStringParameters?.LastEvaluatedKey): undefined);
+        return getPrintsByPrinterIdGetResponse(
+          user,
+          event.pathParameters.id,
+          event.queryStringParameters?.LastEvaluatedKey
+            ? JSON.parse(event.queryStringParameters?.LastEvaluatedKey)
+            : undefined
+        );
       }
 
       if (httpMethod === "POST") {
         return getPrintsByPrinterIdPostResponse(event.body);
       }
-      
+
       //no other methods are available for this path, return a 405 method not found
       return getMethodNotFoundResponse();
     }
 
-    //the /printers/{id}/prints/{printid} endpoints
-    if (path === "/printers/{id}/prints/{printid}" || path === "/printers/{id}/prints/{printid}/") {
+    //the /printers/{id}/prints/{insertedAt} endpoints
+    if (
+      path === "/printers/{id}/prints/{insertedAt}" ||
+      path === "/printers/{id}/prints/{insertedAt}/"
+    ) {
       if (httpMethod === "GET") {
-        return getPrintsByIdByPrinterIdGetResponse(user, event.pathParameters.id, event.pathParameters.printid);
+        return getPrintsByIdByPrinterIdGetResponse(
+          user,
+          event.pathParameters.id,
+          event.pathParameters.insertedAt
+        );
       }
 
       if (httpMethod === "DELETE") {
-        return getPrintsByIdByPrinterIdDeleteResponse(user, event.pathParameters.id, event.pathParameters.printid);
+        console.log(event.pathParameters);
+        return await getPrintsByIdByPrinterIdDeleteResponse(
+          user,
+          event.pathParameters.id,
+          event.pathParameters.insertedAt
+        );
       }
-      
+
       //no other methods are available for this path, return a 405 method not found
       return getMethodNotFoundResponse();
-    }    
-
+    }
   } catch (err) {
     console.log(err);
     return {
