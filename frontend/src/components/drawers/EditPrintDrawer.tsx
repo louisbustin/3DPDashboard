@@ -8,6 +8,7 @@ import ShrunkTextField from "../formelements/ShrunkTextField";
 import IPrint, { Status, getDefaultPrint } from "../../models/IPrint";
 import StyledSelect from "../formelements/StyledSelect";
 import useFilament from "../../hooks/use-filament";
+import { FilamentStatus } from "../../models/IFilament";
 
 const printApiURL = `${process.env.REACT_APP_API_BASE_URL}printers`;
 
@@ -55,7 +56,8 @@ const EditPrintDrawer = (
     });
   };
   const handleClose = (updateOccurred: boolean) => {
-    if (props.onClose) props.onClose(updateOccurred, updateOccurred ? print : undefined);
+    if (props.onClose)
+      props.onClose(updateOccurred, updateOccurred ? print : undefined);
     //clear out any saved filaments when we close the dialog
     setPrint(getDefaultPrint());
   };
@@ -125,6 +127,11 @@ const EditPrintDrawer = (
               {!filamentLoading &&
                 filament &&
                 filament
+                  ?.filter(
+                    (f) =>
+                      f.status === FilamentStatus.Active ||
+                      f.status === undefined
+                  )
                   ?.sort(
                     (a, b) =>
                       a.type.localeCompare(b.type) ||

@@ -1,11 +1,15 @@
 import { PropsWithChildren, useEffect, useState } from "react";
 import EditDrawer from "./EditDrawer";
-import { Stack } from "@mui/material";
-import IFilament, { getDefaultFilament } from "../../models/IFilament";
+import { MenuItem, Stack } from "@mui/material";
+import IFilament, {
+  FilamentStatus,
+  getDefaultFilament,
+} from "../../models/IFilament";
 import useAPIToken from "../../hooks/use-api-token";
 import LoadingDialog from "../LoadingDialog";
 import MessageBanner from "../MessageBanner";
 import ShrunkTextField from "../formelements/ShrunkTextField";
+import StyledSelect from "../formelements/StyledSelect";
 
 const apiURL = `${process.env.REACT_APP_API_BASE_URL}filament`;
 
@@ -91,6 +95,12 @@ const EditFilamentDrawer = (
   const onChangeColor = (color: string) => {
     setFilament((f) => {
       return { ...f, color };
+    });
+  };
+  const onChangeStatus = (status: string | unknown) => {
+    setFilament((f) => {
+      console.log(status, Number(status));
+      return { ...f, status: Number(status) };
     });
   };
   const handleClose = (updateOccurred: boolean) => {
@@ -194,6 +204,21 @@ const EditFilamentDrawer = (
             onChange={(e) => onChangeHighBedTemp(e.target.value)}
             type="number"
           />
+          <StyledSelect
+            id="status"
+            label="Status"
+            value={
+              filament.status === undefined
+                ? FilamentStatus.Active
+                : filament.status
+            }
+            onChange={(e) => {
+              onChangeStatus(e.target.value);
+            }}
+          >
+            <MenuItem value="0">Active</MenuItem>
+            <MenuItem value="1">Inactive</MenuItem>
+          </StyledSelect>
         </Stack>
       </EditDrawer>
     </>
