@@ -235,20 +235,6 @@ const getPrintsByIdByPrinterIdDeleteResponse = async (
   };
 };
 
-// GET /printers/{id}/prints/{printid}
-const getPrintsByIdByPrinterIdGetResponse = (user, printerId, printId) => {
-  return getMethodNotFoundResponse();
-}
-
-// DELETE /printers/{id}/prints/{printid}
-const getPrintsByIdByPrinterIdDeleteResponse = (user, printerId, printId) => {
-  const command = new DeleteCommand({
-    TableName: "3dpdashboard_prints",
-    KeyConditionExpression: ""
-  });
-}
-
-
 export const lambdaHandler = async (event, context) => {
   try {
     const httpMethod = event.httpMethod;
