@@ -1,6 +1,5 @@
 import { Card, CardContent, Link, Stack, Typography } from "@mui/material";
 import FacebookIcon from "@mui/icons-material/Facebook";
-import TwitterIcon from "@mui/icons-material/Twitter";
 import InstagramIcon from "@mui/icons-material/Instagram";
 
 const ContactPage = () => {
@@ -39,13 +38,6 @@ const ContactPage = () => {
                 rel="noreferrer"
               >
                 <FacebookIcon />
-              </Link>
-              <Link
-                href="https://twitter.com/louisbustin"
-                target="_blank"
-                rel="noreferrer"
-              >
-                <TwitterIcon />
               </Link>
               <Link
                 href="https://www.instagram.com/purveyorofawesome/"

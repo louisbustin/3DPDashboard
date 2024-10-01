@@ -1,7 +1,13 @@
-import IFilament from "../models/IFilament";
+import IFilament, { FilamentStatus } from "../models/IFilament";
 import { DataGrid, GridActionsCellItem, GridColDef } from "@mui/x-data-grid";
 import { useState } from "react";
-import { Button, Stack, Tooltip } from "@mui/material";
+import {
+  Button,
+  Checkbox,
+  FormControlLabel,
+  Stack,
+  Tooltip,
+} from "@mui/material";
 import EditFilamentDrawer from "../components/drawers/EditFilamentDrawer";
 import LoadingDialog from "../components/LoadingDialog";
 import ConfirmationDialog from "../components/ConfirmationDialog";
@@ -23,6 +29,7 @@ const FilamentPage = () => {
   const [showLoadingDialog, setShowLoadingDialog] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [showInactive, setShowInactive] = useState(false);
   const bearerToken = useAPIToken();
 
   const openDrawer = (id?: string) => {
@@ -38,7 +45,7 @@ const FilamentPage = () => {
       headers: { Authorization: `Bearer ${bearerToken}` },
     });
     if (response.ok) {
-      await refresh();
+      refresh();
       setSuccessMessage("Filament successfully deleted.");
       setTimeout(() => setSuccessMessage(""), 5000);
     } else {
@@ -96,7 +103,7 @@ const FilamentPage = () => {
         onClose={async (updateOccurred) => {
           if (updateOccurred) {
             setShowLoadingDialog(true);
-            await refresh();
+            refresh();
           }
           setDrawerOpen(false);
           setShowLoadingDialog(false);
@@ -120,6 +127,14 @@ const FilamentPage = () => {
       <h2>Filaments</h2>
       <LoadingDialog open={isLoading || showLoadingDialog}></LoadingDialog>
       <Stack direction="row" spacing={0.5} justifyContent="flex-end">
+        <FormControlLabel
+          control={
+            <Checkbox
+              onChange={(e) => setShowInactive(e.target.checked)}
+            ></Checkbox>
+          }
+          label="Show Inactive"
+        ></FormControlLabel>
         <Button onClick={() => openDrawer()} aria-label="Add">
           <AddIcon />
         </Button>
@@ -127,7 +142,11 @@ const FilamentPage = () => {
 
       {data && (
         <DataGrid
-          rows={data}
+          rows={data.filter((i) =>
+            !showInactive
+              ? i.status === FilamentStatus.Active || i.status === undefined
+              : true
+          )}
           columns={columns}
           initialState={{
             pagination: {

@@ -9,6 +9,12 @@ export default interface IFilament {
   lowBedTemp: number;
   highBedTemp: number;
   color: string;
+  status?: FilamentStatus;
+}
+
+export enum FilamentStatus {
+  Active,
+  Inactive,
 }
 
 export const getDefaultFilament = (): IFilament => {
@@ -23,5 +29,6 @@ export const getDefaultFilament = (): IFilament => {
     lowBedTemp: 0,
     highBedTemp: 0,
     color: "",
+    status: FilamentStatus.Active,
   };
 };
