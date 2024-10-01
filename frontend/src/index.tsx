@@ -108,7 +108,7 @@ root.render(
       domain="eforge.us.auth0.com"
       clientId="LXfZEH7bDbnOShzJrGNxERdtUyWyjpzc"
       authorizationParams={{
-        redirect_uri: window.location.origin,
+        redirect_uri: window.location.href,
       }}
     >
       <Suspense fallback={<LoadingDialog open={true} />}>
