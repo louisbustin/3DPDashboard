@@ -6,7 +6,7 @@ import {
   QueryCommand,
 } from "@aws-sdk/lib-dynamodb";
 import jsonwebtoken from "jsonwebtoken";
-import { marshall } from "@aws-sdk/util-dynamodb";
+import { v4 as uuidv4 } from "uuid";
 
 const getUserInfo = async (authToken) => {
   if (authToken) {
@@ -134,7 +134,7 @@ const getPrintersbyIdDeleteResponse = async (user, printerId) => {
   }
 
   const command = new DeleteCommand({
-    TableName: tableName,
+    TableName: printersTableName,
     Key: {
       id: printerId,
     },

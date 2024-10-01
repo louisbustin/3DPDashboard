@@ -17,6 +17,7 @@ function useFetch<T>(
   const [data, setData] = useState<T>();
   const [isLoading, setIsLoading] = useState(false);
   const [reload, setReload] = useState(uuidv4());
+  const [previousReload, setPreviousReload] = useState(reload);
   const [initState, setInitState] = useState(init);
 
   if (!_.isEqual(init, initState)) {
@@ -43,12 +44,12 @@ function useFetch<T>(
       }
 
       if (token) {
-        if (!data) {
+        if (!data || reload !== previousReload) {
           fetchWithBearerToken();
+          setPreviousReload(reload);
         }
       }
-
-    }, [token, reload, url, init, data]);
+    }, [token, reload, url, init, data, previousReload]);
   } catch (e) {
     setIsLoading(false);
   }
