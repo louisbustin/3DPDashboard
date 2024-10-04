@@ -31,9 +31,9 @@ const getMethodNotFoundResponse = () => {
 };
 
 AWS.config.update({
-  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-  region: process.env.AWS_REGION,
+  accessKeyId: process.env.MY_AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.MY_AWS_SECRET_ACCESS_KEY,
+  region: process.env.MY_AWS_REGION,
 });
 
 const s3 = new AWS.S3();
@@ -46,7 +46,7 @@ async function copyImageToS3(imageUrl) {
 
     // Define S3 upload parameters
     const uploadParams = {
-      Bucket: process.env.S3_BUCKET_NAME,
+      Bucket: process.env.MY_S3_BUCKET_NAME,
       Key: `images/${Date.now()}_${imageUrl.split("/").pop()}`, // Unique key for the image
       Body: buffer,
       ContentType: response.headers["content-type"],
@@ -102,8 +102,8 @@ const getPostResponse = async (event) => {
       requestJSON.EventType === 2
         ? "Complete"
         : requestJSON.EventType === 3
-        ? "Failed"
-        : "Pending";
+          ? "Failed"
+          : "Pending";
 
     //if the print exists, this will replace the original. If it does not, it is created.
     //this ensures the prints table always has the most recent info from the octoeverywhere
@@ -127,7 +127,7 @@ const getPostResponse = async (event) => {
       new PutCommand({
         TableName: "3dpdashboard_prints",
         Item: newPrint,
-      })
+      }),
     );
 
     //log the full request from octoeverywhere
@@ -135,7 +135,7 @@ const getPostResponse = async (event) => {
       new PutCommand({
         TableName: "3dpdashboard_printlogs",
         Item: { id: uuidv4(), insertedAt: Date.now(), ...requestJSON },
-      })
+      }),
     );
   }
 
