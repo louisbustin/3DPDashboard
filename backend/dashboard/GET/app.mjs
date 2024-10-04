@@ -24,7 +24,11 @@ export const lambdaHandler = async (event, context) => {
       KeyConditionExpression: "usersub = :usersub",
       ExpressionAttributeValues: {
         ":usersub": user.sub,
+        ":stat": 0,
+        ":null": null,
       },
+      FilterExpression:
+        "filamentStatus = :stat OR filamentStatus = :null OR attribute_not_exists(filamentStatus)",
       Select: "COUNT",
     });
     const response = await dynamo.send(command);

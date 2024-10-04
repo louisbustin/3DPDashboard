@@ -18,7 +18,7 @@ const EditPrintDrawer = (
     onClose?: (updateOccurred?: boolean, print?: IPrint) => void;
     printerId: string;
     print?: IPrint;
-  }>
+  }>,
 ) => {
   const [isLoading, setIsLoading] = useState(false);
   const [print, setPrint] = useState<IPrint>(getDefaultPrint());
@@ -129,15 +129,15 @@ const EditPrintDrawer = (
                 filament
                   ?.filter(
                     (f) =>
-                      f.status === FilamentStatus.Active ||
-                      f.status === undefined
+                      f.filamentStatus === FilamentStatus.Active ||
+                      f.filamentStatus === undefined,
                   )
                   ?.sort(
                     (a, b) =>
                       a.type.localeCompare(b.type) ||
                       a.brand.localeCompare(b.brand) ||
                       a.name.localeCompare(b.name) ||
-                      a.color.localeCompare(b.color)
+                      a.color.localeCompare(b.color),
                   )
                   .map((f) => {
                     return (
