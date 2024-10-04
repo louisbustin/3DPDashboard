@@ -18,7 +18,7 @@ const EditFilamentDrawer = (
     open: boolean;
     onClose?: (updateOccurred?: boolean) => void;
     filamentId?: string;
-  }>
+  }>,
 ) => {
   const [isLoading, setIsLoading] = useState(false);
   const [filament, setFilament] = useState<IFilament>(getDefaultFilament());
@@ -99,8 +99,7 @@ const EditFilamentDrawer = (
   };
   const onChangeStatus = (status: string | unknown) => {
     setFilament((f) => {
-      console.log(status, Number(status));
-      return { ...f, status: Number(status) };
+      return { ...f, filamentStatus: Number(status) };
     });
   };
   const handleClose = (updateOccurred: boolean) => {
@@ -208,9 +207,9 @@ const EditFilamentDrawer = (
             id="status"
             label="Status"
             value={
-              filament.status === undefined
+              filament.filamentStatus === undefined
                 ? FilamentStatus.Active
-                : filament.status
+                : filament.filamentStatus
             }
             onChange={(e) => {
               onChangeStatus(e.target.value);

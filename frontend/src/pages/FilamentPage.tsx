@@ -144,8 +144,9 @@ const FilamentPage = () => {
         <DataGrid
           rows={data.filter((i) =>
             !showInactive
-              ? i.status === FilamentStatus.Active || i.status === undefined
-              : true
+              ? i.filamentStatus === FilamentStatus.Active ||
+                i.filamentStatus === undefined
+              : true,
           )}
           columns={columns}
           initialState={{
