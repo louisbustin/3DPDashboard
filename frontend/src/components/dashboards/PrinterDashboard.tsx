@@ -155,13 +155,25 @@ const PrinterDashboard = () => {
     {
       field: "SnapshotUrl",
       headerName: "Snapshot",
-      renderCell: (params) =>
-        params.row.SnapshotUrl && (
-          <ImageHoverZoom
-            imagePath={params.row.SnapshotUrl}
-            width={50}
-          ></ImageHoverZoom>
-        ),
+      renderCell: (params) => {
+        if (params.row.imageUrl) {
+          return (
+            <ImageHoverZoom
+              imagePath={params.row.imageUrl}
+              width={50}
+            ></ImageHoverZoom>
+          );
+        }
+        if (params.row.SnapshotUrl) {
+          return (
+            <ImageHoverZoom
+              imagePath={params.row.SnapshotUrl}
+              width={50}
+            ></ImageHoverZoom>
+          );
+        }
+        return <></>;
+      },
     },
     { field: "PrintStatus", headerName: "Status", flex: 1 },
     { field: "FileName", headerName: "File Name", flex: 1 },

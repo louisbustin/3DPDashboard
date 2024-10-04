@@ -1,10 +1,9 @@
-import {
-  DynamoDBClient,
-  QueryCommand,
-  ScanCommand,
-} from "@aws-sdk/client-dynamodb";
+import "dotenv/config";
+import { DynamoDBClient, QueryCommand } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
 import { unmarshall } from "@aws-sdk/util-dynamodb";
+import AWS from "aws-sdk";
+import axios from "axios";
 
 const client = new DynamoDBClient({});
 const dynamo = DynamoDBDocumentClient.from(client);
@@ -30,6 +29,39 @@ const getMethodNotFoundResponse = () => {
     body: "method not found",
   };
 };
+
+AWS.config.update({
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  region: process.env.AWS_REGION,
+});
+
+const s3 = new AWS.S3();
+
+async function copyImageToS3(imageUrl) {
+  try {
+    // Download the image
+    const response = await axios.get(imageUrl, { responseType: "arraybuffer" });
+    const buffer = Buffer.from(response.data, "binary");
+
+    // Define S3 upload parameters
+    const uploadParams = {
+      Bucket: process.env.S3_BUCKET_NAME,
+      Key: `images/${Date.now()}_${imageUrl.split("/").pop()}`, // Unique key for the image
+      Body: buffer,
+      ContentType: response.headers["content-type"],
+    };
+
+    // Upload the image to S3
+    const uploadResult = await s3.upload(uploadParams).promise();
+
+    // Return the S3 URL
+    return uploadResult.Location;
+  } catch (error) {
+    console.error("Error copying image to S3:", error);
+    return "";
+  }
+}
 
 const getPostResponse = async (event) => {
   const requestJSON = JSON.parse(event.body);
@@ -75,6 +107,7 @@ const getPostResponse = async (event) => {
 
     //if the print exists, this will replace the original. If it does not, it is created.
     //this ensures the prints table always has the most recent info from the octoeverywhere
+    const imageUrl = await copyImageToS3(requestJSON.SnapshotUrl);
     const newPrint = {
       printerId: printerJson.id,
       insertedAt: printResultJson.insertedAt
@@ -85,8 +118,10 @@ const getPostResponse = async (event) => {
       PrintStatus: newStatus,
       usersub: printerJson.usersub,
       updatedAt: Date.now(),
+      imageUrl: imageUrl,
       ...requestJSON,
     };
+    //commenting out the save here. just testing the upload for now
 
     await dynamo.send(
       new PutCommand({
