@@ -19,6 +19,7 @@ export default interface IPrint {
   TimeRemaningSec?: number;
   DurationSec?: number;
   PrintId?: string;
+  imageUrl?: string;
 }
 
 export const getDefaultPrint = (): IPrint => {

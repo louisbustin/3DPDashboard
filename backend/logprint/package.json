@@ -7,7 +7,9 @@
   "author": "eForge.us",
   "license": "MIT",
   "dependencies": {
-    "axios": ">=0.21.1",
+    "aws-sdk": "^2.1691.0",
+    "axios": "^1.7.7",
+    "dotenv": "^16.4.5",
     "uuid": "^9.0.1"
   }
 }
