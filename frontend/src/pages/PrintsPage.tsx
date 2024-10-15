@@ -46,6 +46,7 @@ const PrintsPage = () => {
             onDeleteSuccess={() => refresh()}
             allowDelete={true}
             allowEdit={true}
+            includePrinterName={true}
           ></PrintsGrid>
         </>
       )}
