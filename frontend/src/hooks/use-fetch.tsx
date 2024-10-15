@@ -19,14 +19,24 @@ function useFetch<T>(
   const [reload, setReload] = useState(uuidv4());
   const [previousReload, setPreviousReload] = useState(reload);
   const [initState, setInitState] = useState(init);
+  const [previousUrl, setPreviousUrl] = useState(url);
 
   if (!_.isEqual(init, initState)) {
     setInitState(init);
   }
   const mutate = () => {
-    console.log("mutating");
     setReload(uuidv4());
   };
+
+  // Reload data every reloadTime milliseconds
+  useEffect(() => {
+    if (!init || !init.reloadTime || init?.reloadTime === 0) return;
+    const interval = setInterval(() => {
+      mutate();
+    }, init?.reloadTime);
+    return () => clearInterval(interval);
+  }, [init]);
+
   try {
     useEffect(() => {
       async function fetchWithBearerToken() {
@@ -44,15 +54,29 @@ function useFetch<T>(
       }
 
       if (token) {
-        if (!data || reload !== previousReload) {
+        if (
+          (!data || reload !== previousReload || url !== previousUrl) &&
+          !isLoading
+        ) {
           fetchWithBearerToken();
           setPreviousReload(reload);
+          setPreviousUrl(url);
         }
       }
-    }, [token, reload, url, init, data, previousReload]);
+    }, [
+      token,
+      reload,
+      url,
+      init,
+      data,
+      previousReload,
+      previousUrl,
+      isLoading,
+    ]);
   } catch (e) {
     setIsLoading(false);
   }
+
   return { isLoading, data, refresh: mutate };
 }
 

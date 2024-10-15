@@ -57,38 +57,7 @@ Resources:
           Properties:
             Path: /filament
             Method: options
-  FilamentByIdGET:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
-    Properties:
-      CodeUri: filament/byid/GET
-      Handler: app.lambdaHandler
-      Runtime: nodejs18.x
-      Architectures:
-        - x86_64
-      Policies:
-        - AmazonDynamoDBFullAccess
-      Events:
-        Filament:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
-          Properties:
-            Path: /filament/{id}
-            Method: get
-  FilamentByIdOPTIONS:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
-    Properties:
-      CodeUri: filament/byid/OPTIONS
-      Handler: app.lambdaHandler
-      Runtime: nodejs18.x
-      Architectures:
-        - x86_64
-      Policies:
-        - AmazonDynamoDBFullAccess
-      Events:
-        Filament:
-          Type: Api
-          Properties:
-            Path: /filament/{id}
-            Method: options
+
   FilamentByIdDELETE:
     Type: AWS::Serverless::Function
     Properties:
@@ -344,4 +313,55 @@ Resources:
           Type: Api
           Properties:
             Path: /logprint
+            Method: options
+  MainHandler:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: handler/build
+      Handler: app.lambdaHandler
+      Runtime: nodejs20.x
+      Architectures:
+        - x86_64
+      Policies:
+        - AmazonDynamoDBFullAccess
+      Events:
+        PrintsGet:
+          Type: Api
+          Properties:
+            Path: /prints
+            Method: get
+        PrintsOptions:
+          Type: Api
+          Properties:
+            Path: /prints
+            Method: options
+        PrintsByIdGet:
+          Type: Api
+          Properties:
+            Path: /prints/{id}
+            Method: get
+        PrintsByIdOptions:
+          Type: Api
+          Properties:
+            Path: /prints/{id}
+            Method: options
+        PrintsByIdPost:
+          Type: Api
+          Properties:
+            Path: /prints/{id}
+            Method: post
+        PrintsByIdDelete:
+          Type: Api
+          Properties:
+            Path: /prints/{id}
+            Method: delete
+        FilamentByIDGet:
+          Type: Api
+          Properties:
+            Path: /filament/{id}
+            Method: get
+        FilamentByIDOptions:
+          Type: Api
+          Properties:
+            Path: /filament/{id}
             Method: options

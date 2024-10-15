@@ -13,7 +13,7 @@ import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 import ResinPage from "./pages/ResinPage";
-import PrintPage from "./pages/PrintPage";
+import PrintsPage from "./pages/PrintsPage";
 import LoadingDialog from "./components/LoadingDialog";
 
 const PrivacyPage = React.lazy(() => import("./pages/PrivacyPage"));
@@ -74,7 +74,7 @@ const router = createBrowserRouter([
       },
       {
         path: "prints",
-        element: <PrintPage />,
+        element: <PrintsPage />,
       },
       {
         path: "filament",
@@ -109,6 +109,7 @@ root.render(
       clientId="LXfZEH7bDbnOShzJrGNxERdtUyWyjpzc"
       authorizationParams={{
         redirect_uri: window.location.href,
+        audience: "https://api.3dpdashboard.com/",
       }}
     >
       <Suspense fallback={<LoadingDialog open={true} />}>

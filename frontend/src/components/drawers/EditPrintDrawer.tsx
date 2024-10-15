@@ -10,7 +10,7 @@ import StyledSelect from "../formelements/StyledSelect";
 import useFilament from "../../hooks/use-filament";
 import { FilamentStatus } from "../../models/IFilament";
 
-const printApiURL = `${process.env.REACT_APP_API_BASE_URL}printers`;
+const printApiURL = `${process.env.REACT_APP_API_BASE_URL}prints`;
 
 const EditPrintDrawer = (
   props: PropsWithChildren<{
@@ -18,7 +18,7 @@ const EditPrintDrawer = (
     onClose?: (updateOccurred?: boolean, print?: IPrint) => void;
     printerId: string;
     print?: IPrint;
-  }>,
+  }>
 ) => {
   const [isLoading, setIsLoading] = useState(false);
   const [print, setPrint] = useState<IPrint>(getDefaultPrint());
@@ -64,7 +64,7 @@ const EditPrintDrawer = (
 
   const savePrint = async () => {
     setIsLoading(true);
-    const response = await fetch(`${printApiURL}/${print.printerId}/prints`, {
+    const response = await fetch(`${printApiURL}/${print.PrintId}`, {
       method: "POST",
       body: JSON.stringify(print),
       headers: { Authorization: `Bearer ${bearerToken}` },
@@ -130,14 +130,14 @@ const EditPrintDrawer = (
                   ?.filter(
                     (f) =>
                       f.filamentStatus === FilamentStatus.Active ||
-                      f.filamentStatus === undefined,
+                      f.filamentStatus === undefined
                   )
                   ?.sort(
                     (a, b) =>
                       a.type.localeCompare(b.type) ||
                       a.brand.localeCompare(b.brand) ||
                       a.name.localeCompare(b.name) ||
-                      a.color.localeCompare(b.color),
+                      a.color.localeCompare(b.color)
                   )
                   .map((f) => {
                     return (

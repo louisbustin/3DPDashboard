@@ -4,8 +4,7 @@ import useFetch from "./use-fetch";
 const apiURL = `${process.env.REACT_APP_API_BASE_URL}printers/`;
 
 const usePrinters = () => {
-  
-  const p = useFetch<IPrinter[]>(apiURL, { reloadTime: 60 });
+  const p = useFetch<IPrinter[]>(apiURL);
 
   return { printers: p.data, isLoading: p.isLoading, refresh: p.refresh };
 };
