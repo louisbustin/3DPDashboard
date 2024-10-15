@@ -1,0 +1,6 @@
+{
+  "watch": ["handler/*"],
+  "ext": "ts,json",
+  "ignore": ["node_modules/**"],
+  "exec": "tsc -p tsconfig.json || exit 1"
+}

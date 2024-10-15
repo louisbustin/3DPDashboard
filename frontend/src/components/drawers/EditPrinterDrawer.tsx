@@ -72,7 +72,6 @@ const EditPrinterDrawer = (
   };
   const savePrinter = async () => {
     setIsLoading(true);
-    console.log(printer);
     const response = await fetch(apiURL, {
       method: "POST",
       body: JSON.stringify(printer),

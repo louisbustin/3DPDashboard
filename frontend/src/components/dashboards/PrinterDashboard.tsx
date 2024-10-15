@@ -1,24 +1,18 @@
-import { Card, Chip, Grid, Stack, Tooltip } from "@mui/material";
+import { Card, Chip, Grid, Stack } from "@mui/material";
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import PieChartCard from "../PieChartCard";
 import { DefaultizedPieValueType, PieItemIdentifier } from "@mui/x-charts";
-import { DataGrid, GridActionsCellItem, GridColDef } from "@mui/x-data-grid";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
-import IPrint, { getDefaultPrint } from "../../models/IPrint";
-import moment from "moment";
-import EditPrintDrawer from "../drawers/EditPrintDrawer";
-import ConfirmationDialog from "../ConfirmationDialog";
+import IPrint from "../../models/IPrint";
 import MessageBanner from "../MessageBanner";
 import useAPIToken from "../../hooks/use-api-token";
 import LoadingDialog from "../LoadingDialog";
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs, { Dayjs } from "dayjs";
-import ImageHoverZoom from "../ImageHoverZoom";
 import BarChartCard from "../BarChartCard";
 import usePrinters from "../../hooks/use-printers";
 import { IPrintLastEvaluatedKey } from "../../models/IPrintResponse";
+import PrintsGrid from "../grids/PrintsGrid";
 
 const MAX_DATE = 9999999999999;
 const MIN_DATE = 0;
@@ -37,9 +31,6 @@ const PrinterDashboard = () => {
   const data = printers?.filter((p) => p.id === printerid)[0];
   const [dashboardData, setDashboardData] = useState<IPrinterDashboardData>();
   const [printFilter, setPrintFilter] = useState("");
-  const [showEditPrintDrawer, setShowEditPrintDrawer] = useState(false);
-  const [selectedPrint, setSelectedPrint] = useState<IPrint>(getDefaultPrint());
-  const [showDeletePrintDialog, setShowDeletePrintDialog] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const bearerToken = useAPIToken();
@@ -63,14 +54,14 @@ const PrinterDashboard = () => {
             "/prints" +
             (evalKey
               ? `?LastEvaluatedKey=${encodeURIComponent(
-                  JSON.stringify(evalKey)
+                  JSON.stringify(evalKey),
                 )}`
               : ""),
           {
             headers: {
               Authorization: `Bearer ${bearerToken}`,
             },
-          }
+          },
         );
 
         p = await response.json();
@@ -117,7 +108,7 @@ const PrinterDashboard = () => {
   const onPieChartClick = (
     event: React.MouseEvent<SVGPathElement, MouseEvent>,
     itemIdentifier: PieItemIdentifier,
-    item: DefaultizedPieValueType
+    item: DefaultizedPieValueType,
   ) => {
     if (printFilter !== item.label) {
       setPrintFilter(item.label || "");
@@ -126,99 +117,30 @@ const PrinterDashboard = () => {
     }
   };
 
-  const deletePrint = async () => {
-    //selected print should be the one we want deleted
-    const response = await fetch(
-      `${apiURL}${selectedPrint.printerId}/prints/${selectedPrint.insertedAt}`,
-      {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${bearerToken}`,
-        },
-      }
-    );
-    if (response && response.ok) {
-      setPrints((printArray) => {
-        const newArray = printArray.filter(
-          (p) => p.insertedAt !== selectedPrint.insertedAt
-        );
-        return [...newArray];
+  const onDeletePrint = async (print: IPrint) => {
+    setPrints((printArray) => {
+      const newArray = printArray.filter(
+        (p) => p.insertedAt !== print.insertedAt,
+      );
+      return [...newArray];
+    });
+    setSuccessMessage("Delete of print successful.");
+    setTimeout(() => setSuccessMessage(""), 5000);
+  };
+
+  const onEditPrint = (print: IPrint) => {
+    if (print) {
+      setPrints((prints) => {
+        for (let i = 0; i < prints.length; i++) {
+          if (prints[i].insertedAt === print.insertedAt) {
+            prints[i] = print;
+            break;
+          }
+        }
+        return [...prints];
       });
-      setShowDeletePrintDialog(false);
-      setSuccessMessage("Delete of print successful.");
-    } else {
-      setErrorMessage("Delete was not successful.");
-      setShowDeletePrintDialog(false);
     }
   };
-  const columns: GridColDef<IPrint>[] = [
-    {
-      field: "SnapshotUrl",
-      headerName: "Snapshot",
-      renderCell: (params) => {
-        if (params.row.imageUrl) {
-          return (
-            <ImageHoverZoom
-              imagePath={params.row.imageUrl}
-              width={50}
-            ></ImageHoverZoom>
-          );
-        }
-        if (params.row.SnapshotUrl) {
-          return (
-            <ImageHoverZoom
-              imagePath={params.row.SnapshotUrl}
-              width={50}
-            ></ImageHoverZoom>
-          );
-        }
-        return <></>;
-      },
-    },
-    { field: "PrintStatus", headerName: "Status", flex: 1 },
-    { field: "FileName", headerName: "File Name", flex: 1 },
-    { field: "DurationSec", headerName: "Duration (secs)", flex: 1 },
-    { field: "amountUsed", headerName: "Amount Used", flex: 1 },
-    {
-      field: "insertedAt",
-      headerName: "Added At",
-      flex: 1,
-      valueGetter: (params) =>
-        moment(params.row.insertedAt).format("YYYY-MM-DD"),
-    },
-    {
-      field: "actions",
-      type: "actions",
-      headerName: "Actions",
-      cellClassName: "actions",
-      width: 150,
-      getActions: (p) => {
-        return [
-          <Tooltip title="Edit" enterDelay={1000}>
-            <GridActionsCellItem
-              icon={<EditIcon />}
-              label="Edit"
-              onClick={() => {
-                setSelectedPrint({ ...p.row });
-                setShowEditPrintDrawer(true);
-              }}
-            />
-          </Tooltip>,
-          <Tooltip title="Delete" enterDelay={1000}>
-            <GridActionsCellItem
-              icon={<DeleteIcon />}
-              label="Delete"
-              onClick={() => {
-                setSelectedPrint({ ...p.row });
-                setShowDeletePrintDialog(true);
-              }}
-              color="inherit"
-            />
-          </Tooltip>,
-        ];
-      },
-    },
-  ];
 
   return (
     <>
@@ -338,7 +260,7 @@ const PrinterDashboard = () => {
                   onChange={
                     (v: Dayjs | null) =>
                       setMaxDateFilter(
-                        v ? v.unix() * 1000 + 86399999 : MAX_DATE
+                        v ? v.unix() * 1000 + 86399999 : MAX_DATE,
                       ) //Adding a day's (-1) amount of milliseconds to that the filters include that date
                   }
                   slotProps={{
@@ -352,7 +274,7 @@ const PrinterDashboard = () => {
               {minDateFilter > 0 && (
                 <Chip
                   label={`Inserted after ${new Date(
-                    minDateFilter
+                    minDateFilter,
                   ).toLocaleDateString()}`}
                   onDelete={() => setMinDateFilter(0)}
                   sx={{ marginRight: 1 }}
@@ -361,7 +283,7 @@ const PrinterDashboard = () => {
               {maxDateFilter < MAX_DATE && (
                 <Chip
                   label={`Inserted before ${new Date(
-                    maxDateFilter
+                    maxDateFilter,
                   ).toLocaleDateString()}`}
                   onDelete={() => setMaxDateFilter(MAX_DATE)}
                   sx={{ marginRight: 1 }}
@@ -375,60 +297,22 @@ const PrinterDashboard = () => {
                 />
               )}
             </Grid>
-            <DataGrid
-              rows={prints.filter((p) => {
+            <PrintsGrid
+              prints={prints.filter((p) => {
                 return (
                   (printFilter === "" || p.PrintStatus === printFilter) &&
                   minDateFilter <= p.insertedAt &&
                   p.insertedAt <= maxDateFilter
                 );
               })}
-              columns={columns}
-              initialState={{
-                pagination: {
-                  paginationModel: { page: 0, pageSize: 10 },
-                },
-                sorting: {
-                  sortModel: [{ field: "insertedAt", sort: "desc" }],
-                },
-              }}
-              pageSizeOptions={[10, 50, 100]}
-              sx={{ marginTop: 2, marginLeft: 3 }}
-              autoHeight
-              getRowId={(row) => row.insertedAt}
+              allowDelete={true}
+              allowEdit={true}
+              onEditSuccess={onEditPrint}
+              onDeleteSuccess={onDeletePrint}
             />
           </>
         )}
       </Grid>
-      {data && (
-        <EditPrintDrawer
-          open={showEditPrintDrawer}
-          printerId={data?.id}
-          print={selectedPrint}
-          onClose={(didUpdate, updatedPrint) => {
-            if (updatedPrint) {
-              setPrints((prints) => {
-                for (let i = 0; i < prints.length; i++) {
-                  if (prints[i].insertedAt === updatedPrint.insertedAt) {
-                    prints[i] = updatedPrint;
-                    break;
-                  }
-                }
-                return [...prints];
-              });
-            }
-            setShowEditPrintDrawer(false);
-          }}
-        ></EditPrintDrawer>
-      )}
-      <ConfirmationDialog
-        open={showDeletePrintDialog}
-        onCancel={() => setShowDeletePrintDialog(false)}
-        onConfirm={() => deletePrint()}
-      >
-        Are you sure you want to delete this print? This action cannot be
-        undone.
-      </ConfirmationDialog>
     </>
   );
 };

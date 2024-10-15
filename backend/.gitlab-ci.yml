@@ -1,5 +1,4 @@
-
-build-backend:       # This job runs in the build stage, which runs first.
+build-backend: # This job runs in the build stage, which runs first.
   image: public.ecr.aws/sam/build-nodejs18.x:latest
   stage: build
   only:
@@ -14,6 +13,12 @@ build-backend:       # This job runs in the build stage, which runs first.
   before_script:
     - cd backend
   script:
+    - echo "Building the Typescript handler..."
+    - cd handler
+    - npm install
+    - npm run build
+    - echo "Typescript handler built."
+    - cd ..
     - echo "Compiling the code..."
     - sam build
     - echo "Compile complete."
@@ -34,4 +39,3 @@ deploy-backend:
     - echo "Deploying container to s3"
     - sam deploy --no-confirm-changeset --no-fail-on-empty-changeset
     - echo "Deploy done for container"
-
