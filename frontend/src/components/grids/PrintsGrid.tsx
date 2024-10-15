@@ -10,6 +10,7 @@ import { useState } from "react";
 import ConfirmationDialog from "../ConfirmationDialog";
 import LoadingDialog from "../LoadingDialog";
 import useAPIToken from "../../hooks/use-api-token";
+import usePrinters from "../../hooks/use-printers";
 
 const apiURL = `${process.env.REACT_APP_API_BASE_URL}prints/`;
 
@@ -20,6 +21,7 @@ const PrintsGrid = (
     allowDelete?: boolean;
     onEditSuccess?: (editedPrint: IPrint) => void;
     onDeleteSuccess?: (deletedPrint: IPrint) => void;
+    includePrinterName?: boolean;
   }>
 ) => {
   const [showEditPrintDrawer, setShowEditPrintDrawer] = useState(false);
@@ -27,6 +29,7 @@ const PrintsGrid = (
   const [showDeletePrintDialog, setShowDeletePrintDialog] = useState(false);
   const [printToDelete, setPrintToDelete] = useState<IPrint | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const { printers } = usePrinters();
 
   const apiToken = useAPIToken();
 
@@ -108,6 +111,18 @@ const PrintsGrid = (
       },
     },
   ];
+
+  if (props.includePrinterName) {
+    columns.splice(2, 0, {
+      field: "PrinterName",
+      headerName: "Printer",
+      flex: 1,
+      renderCell: (params) => {
+        const printer = printers?.find((p) => p.id === params.row.printerId);
+        return printer ? `${printer.brand} - ${printer.name}` : "";
+      },
+    });
+  }
 
   const deletePrint = async (print: IPrint) => {
     setIsLoading(true);
