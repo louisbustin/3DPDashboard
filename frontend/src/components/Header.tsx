@@ -135,18 +135,18 @@ const Header = () => {
               {!isLoading &&
                 isAuthenticated &&
                 pages.map((page) => (
-                  <Button
+                  <NavLink
                     key={page.name}
-                    onClick={handleCloseNavMenu}
-                    sx={{ my: 2, color: "white", display: "block" }}
+                    to={page.link}
+                    style={{ color: "inherit", textDecoration: "none" }}
                   >
-                    <NavLink
-                      to={page.link}
-                      style={{ color: "inherit", textDecoration: "none" }}
+                    <Button
+                      onClick={handleCloseNavMenu}
+                      sx={{ my: 2, color: "white", display: "block" }}
                     >
                       {page.name}
-                    </NavLink>
-                  </Button>
+                    </Button>
+                  </NavLink>
                 ))}
             </Box>
             <UserAuthMenu />

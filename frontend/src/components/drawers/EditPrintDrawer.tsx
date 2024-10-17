@@ -7,8 +7,7 @@ import MessageBanner from "../MessageBanner";
 import ShrunkTextField from "../formelements/ShrunkTextField";
 import IPrint, { Status, getDefaultPrint } from "../../models/IPrint";
 import StyledSelect from "../formelements/StyledSelect";
-import useFilament from "../../hooks/use-filament";
-import { FilamentStatus } from "../../models/IFilament";
+import FilamentSelection from "../formelements/FilamentSelection";
 
 const printApiURL = `${process.env.REACT_APP_API_BASE_URL}prints`;
 
@@ -26,7 +25,6 @@ const EditPrintDrawer = (
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const bearerToken = useAPIToken();
-  const { filament, isLoading: filamentLoading } = useFilament();
 
   useEffect(() => {
     if (props.print) {
@@ -81,7 +79,7 @@ const EditPrintDrawer = (
 
   return (
     <>
-      <LoadingDialog open={isLoading || filamentLoading} />
+      <LoadingDialog open={isLoading} />
       <MessageBanner
         successMessage={successMessage}
         errorMessage={errorMessage}
@@ -117,38 +115,10 @@ const EditPrintDrawer = (
             value={print.amountUsed}
             onChange={(e) => onChangeAmount(e.target.value)}
           />
-          {filament && (
-            <StyledSelect
-              id="printer-filament"
-              label="Filament"
-              value={print.filamentId}
-              onChange={(e) => onChangeFilament(e.target.value as string)}
-            >
-              {!filamentLoading &&
-                filament &&
-                filament
-                  ?.filter(
-                    (f) =>
-                      f.filamentStatus === FilamentStatus.Active ||
-                      f.filamentStatus === undefined
-                  )
-                  ?.sort(
-                    (a, b) =>
-                      a.type.localeCompare(b.type) ||
-                      a.brand.localeCompare(b.brand) ||
-                      a.name.localeCompare(b.name) ||
-                      a.color.localeCompare(b.color)
-                  )
-                  .map((f) => {
-                    return (
-                      <MenuItem key={f.id} value={f.id}>
-                        {f.type && `(${f.type})`} {f.brand} - {f.name} -{" "}
-                        {f.color}
-                      </MenuItem>
-                    );
-                  })}
-            </StyledSelect>
-          )}
+          <FilamentSelection
+            onChange={onChangeFilament}
+            filamentId={print.filamentId || ""}
+          ></FilamentSelection>
           <ShrunkTextField
             id="duration"
             label="Duration (secs)"
