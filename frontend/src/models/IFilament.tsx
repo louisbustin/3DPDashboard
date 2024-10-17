@@ -10,6 +10,7 @@ export default interface IFilament {
   highBedTemp: number;
   color: string;
   filamentStatus?: FilamentStatus;
+  colorCode?: string;
 }
 
 export enum FilamentStatus {

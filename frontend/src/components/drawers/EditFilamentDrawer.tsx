@@ -11,6 +11,8 @@ import MessageBanner from "../MessageBanner";
 import ShrunkTextField from "../formelements/ShrunkTextField";
 import StyledSelect from "../formelements/StyledSelect";
 
+import ColorPickerButton from "../buttons/ColorPickerButton";
+
 const apiURL = `${process.env.REACT_APP_API_BASE_URL}filament`;
 
 const EditFilamentDrawer = (
@@ -18,7 +20,7 @@ const EditFilamentDrawer = (
     open: boolean;
     onClose?: (updateOccurred?: boolean) => void;
     filamentId?: string;
-  }>,
+  }>
 ) => {
   const [isLoading, setIsLoading] = useState(false);
   const [filament, setFilament] = useState<IFilament>(getDefaultFilament());
@@ -97,6 +99,11 @@ const EditFilamentDrawer = (
       return { ...f, color };
     });
   };
+  const onChangeColorCode = (colorCode: string) => {
+    setFilament((f) => {
+      return { ...f, colorCode };
+    });
+  };
   const onChangeStatus = (status: string | unknown) => {
     setFilament((f) => {
       return { ...f, filamentStatus: Number(status) };
@@ -156,18 +163,25 @@ const EditFilamentDrawer = (
             value={filament.name}
             onChange={(e) => onChangeName(e.target.value)}
           />
-          <ShrunkTextField
-            id="color"
-            label="Color"
-            value={filament.color}
-            onChange={(e) => onChangeColor(e.target.value)}
-          />
+          <Stack direction="row">
+            <ShrunkTextField
+              id="color"
+              label="Color"
+              value={filament.color}
+              onChange={(e) => onChangeColor(e.target.value)}
+              sx={{ mr: 1 }}
+            />
+            <ColorPickerButton
+              color={filament.colorCode}
+              onChangeComplete={(color) => onChangeColorCode(color)}
+            />
+          </Stack>
           <ShrunkTextField
             id="type"
             label="Type"
             value={filament.type}
             onChange={(e) => onChangeType(e.target.value)}
-          />{" "}
+          />
           <ShrunkTextField
             id="weight"
             label="Total Weight"
