@@ -122,7 +122,11 @@ const EditFilamentDrawer = (
       headers: { Authorization: `Bearer ${bearerToken}` },
     });
     if (response.ok) {
-      setSuccessMessage("Filament created successfully.");
+      setSuccessMessage(
+        filament.id
+          ? "Filament updated successfully."
+          : "Filament created successfully."
+      );
       handleClose(true);
       setTimeout(() => setSuccessMessage(""), 5000);
     } else {
