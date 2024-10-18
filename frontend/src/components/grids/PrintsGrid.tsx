@@ -59,14 +59,26 @@ const PrintsGrid = (
         return <></>;
       },
     },
-    { field: "PrintStatus", headerName: "Status", flex: 1 },
+    { field: "PrintStatus", headerName: "Status" },
     { field: "FileName", headerName: "File Name", flex: 1 },
-    { field: "DurationSec", headerName: "Duration (secs)", flex: 1 },
-    { field: "amountUsed", headerName: "Amount Used", flex: 1 },
+    {
+      field: "DurationSec",
+      headerName: "Duration",
+      renderCell: (params) => {
+        const duration = params.row.DurationSec || 0;
+        const hours = Math.floor(duration / 3600);
+        const minutes = Math.floor((duration - hours * 3600) / 60);
+        const seconds = duration - hours * 3600 - minutes * 60;
+        let timeString = hours ? hours.toString() + "h " : "";
+        timeString += minutes ? minutes.toString() + "m " : "";
+        timeString += seconds ? seconds.toString() + "s " : "";
+        return timeString;
+      },
+    },
+    { field: "amountUsed", headerName: "Amount Used" },
     {
       field: "insertedAt",
       headerName: "Added At",
-      flex: 1,
       valueGetter: (params) =>
         moment(params.row.insertedAt).format("YYYY-MM-DD"),
     },
@@ -116,11 +128,11 @@ const PrintsGrid = (
     columns.splice(2, 0, {
       field: "PrinterName",
       headerName: "Printer",
-      flex: 1,
       renderCell: (params) => {
         const printer = printers?.find((p) => p.id === params.row.printerId);
         return printer ? `${printer.brand} - ${printer.name}` : "";
       },
+      width: 175,
     });
   }
 
