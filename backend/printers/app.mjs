@@ -165,7 +165,7 @@ const getPrintsByPrinterIdGetResponse = async (
         ":printerid": printerId,
       },
       ExclusiveStartKey,
-      ScanIndexForward: true,
+      ScanIndexForward: false,
       Limit: 50,
     });
 
