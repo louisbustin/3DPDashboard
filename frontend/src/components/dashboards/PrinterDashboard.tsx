@@ -14,6 +14,7 @@ import usePrinters from "../../hooks/use-printers";
 import { IPrintLastEvaluatedKey } from "../../models/IPrintResponse";
 import PrintsGrid from "../grids/PrintsGrid";
 import BaseButton from "../buttons/BaseButton";
+import CollapseArea from "../CollapseArea";
 
 const MAX_DATE = 9999999999999;
 const MIN_DATE = 0;
@@ -27,6 +28,7 @@ type IPrinterDashboardData = {
 };
 
 const PrinterDashboard = () => {
+  const EXPAND_GRAPHS_KEY = "expand-graphs";
   const { printerid } = useParams();
   const { printers, isLoading } = usePrinters();
   const data = printers?.filter((p) => p.id === printerid)[0];
@@ -161,85 +163,106 @@ const PrinterDashboard = () => {
       <Grid container spacing={3} justifyContent="center" alignContent="center">
         {dashboardData && (
           <>
-            <Grid item xs={12} md={4}>
-              <PieChartCard
-                pieChartProps={{
-                  height: 250,
-                  onClick: onPieChartClick,
-                  series: [
-                    {
-                      data: [
-                        {
-                          id: 0,
-                          value: dashboardData.successCount,
-                          label: "Complete",
-                          color: "green",
+            <Grid item xs={12}>
+              <CollapseArea
+                initiallyExpanded={true}
+                summary="Graphs"
+                storageKey={EXPAND_GRAPHS_KEY}
+              >
+                <Grid
+                  container
+                  spacing={3}
+                  justifyContent="center"
+                  alignContent="center"
+                >
+                  <Grid item xs={12} md={4}>
+                    <PieChartCard
+                      pieChartProps={{
+                        height: 250,
+                        onClick: onPieChartClick,
+                        series: [
+                          {
+                            data: [
+                              {
+                                id: 0,
+                                value: dashboardData.successCount,
+                                label: "Complete",
+                                color: "green",
+                              },
+                              {
+                                id: 1,
+                                value: dashboardData.failureCount,
+                                label: "Failed",
+                                color: "red",
+                              },
+                              {
+                                id: 2,
+                                value: dashboardData.pendingCount,
+                                label: "Pending",
+                                color: "yellow",
+                              },
+                            ],
+                            highlightScope: {
+                              faded: "global",
+                              highlighted: "item",
+                            },
+                            faded: {
+                              innerRadius: 30,
+                              additionalRadius: -30,
+                              color: "gray",
+                            },
+                          },
+                        ],
+                        slotProps: {
+                          legend: {
+                            direction: "column",
+                            position: {
+                              vertical: "middle",
+                              horizontal: "right",
+                            },
+                            padding: 0,
+                          },
                         },
-                        {
-                          id: 1,
-                          value: dashboardData.failureCount,
-                          label: "Failed",
-                          color: "red",
-                        },
-                        {
-                          id: 2,
-                          value: dashboardData.pendingCount,
-                          label: "Pending",
-                          color: "yellow",
-                        },
-                      ],
-                      highlightScope: { faded: "global", highlighted: "item" },
-                      faded: {
-                        innerRadius: 30,
-                        additionalRadius: -30,
-                        color: "gray",
-                      },
-                    },
-                  ],
-                  slotProps: {
-                    legend: {
-                      direction: "column",
-                      position: { vertical: "middle", horizontal: "right" },
-                      padding: 0,
-                    },
-                  },
-                }}
-                title="Prints by Status"
-                height="90%"
-              />
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <BarChartCard
-                barCharProps={{
-                  height: 250,
-                  yAxis: [
-                    {
-                      data: [{ label: "Complete" }, "Failed", "Pending"],
-                    },
-                  ],
-                  xAxis: [
-                    {
-                      scaleType: "band",
-                      data: [
-                        "PolyMaker",
-                        "PrintBed",
-                        "No Filament Selected",
-                        "All Others",
-                      ],
-                    },
-                  ],
-                  series: [
-                    { data: [2, 3, 5, 3] },
-                    { data: [1, 6, 3, 2] },
-                    { data: [2, 5, 6, 2] },
-                  ],
-                }}
-                title="Prints by Filament"
-                height="90%"
-              ></BarChartCard>
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <Card sx={{ p: 3 }}>Prints by Filename coming</Card>
+                      }}
+                      title="Prints by Status"
+                      height="90%"
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={4}>
+                    <BarChartCard
+                      barCharProps={{
+                        height: 250,
+                        yAxis: [
+                          {
+                            data: [{ label: "Complete" }, "Failed", "Pending"],
+                          },
+                        ],
+                        xAxis: [
+                          {
+                            scaleType: "band",
+                            data: [
+                              "PolyMaker",
+                              "PrintBed",
+                              "No Filament Selected",
+                              "All Others",
+                            ],
+                          },
+                        ],
+                        series: [
+                          { data: [2, 3, 5, 3] },
+                          { data: [1, 6, 3, 2] },
+                          { data: [2, 5, 6, 2] },
+                        ],
+                      }}
+                      title="Prints by Filament"
+                      height="90%"
+                    ></BarChartCard>
+                  </Grid>
+                  <Grid item xs={12} md={4}>
+                    <Card sx={{ p: 3 }}>Prints by Filename coming</Card>
+                  </Grid>
+                </Grid>
+              </CollapseArea>
             </Grid>
           </>
         )}
