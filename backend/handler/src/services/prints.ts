@@ -5,11 +5,12 @@ import { RouterHandler } from "../util/router";
 import { QueryCommand } from "@aws-sdk/client-dynamodb";
 import { unmarshall } from "@aws-sdk/util-dynamodb";
 import { DeleteCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
+import { v4 } from "uuid";
 
 export const getPrintsByUser = async (
   usersub: string,
   startDate: number,
-  endDate: number
+  endDate: number,
 ) => {
   const dynamo = getDynamoDBClient();
 
@@ -32,10 +33,26 @@ export const getPrintsByUser = async (
   }
 };
 
-const savePrint = async (printStr: string, usersub: string) => {
+const savePrint = async (
+  printStr: string,
+  usersub: string,
+  pathId?: string,
+) => {
   const print = JSON.parse(printStr);
+
   //always set the usersub to the current user
   print.usersub = usersub;
+
+  //always update the updatedAt time
+  print.updatedAt = Date.now();
+
+  // if the id in the path is undefined, this is a new print
+  // in that case, setup some fields, like id and insertedAt
+  console.log("pathId", pathId);
+  if (!pathId) {
+    print.PrintId = v4();
+    print.insertedAt = Date.now();
+  }
 
   const command = new PutCommand({
     TableName: "3dpdashboard_prints",
@@ -159,7 +176,11 @@ export const savePrintsAPIResponse: RouterHandler = async (context) => {
   }
 
   try {
-    const result = await savePrint(print, context.usersub);
+    const result = await savePrint(
+      print,
+      context.usersub,
+      context.event.pathParameters?.id,
+    );
   } catch (e) {
     console.error(e);
     return await getBaseResponse(HTTP_STATUS.INTERNAL_SERVER_ERROR);

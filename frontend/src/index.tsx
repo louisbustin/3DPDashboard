@@ -15,6 +15,7 @@ import "@fontsource/roboto/700.css";
 import ResinPage from "./pages/ResinPage";
 import PrintsPage from "./pages/PrintsPage";
 import LoadingDialog from "./components/LoadingDialog";
+import DocumentationPage from "./pages/DocumentationPage";
 
 const PrivacyPage = React.lazy(() => import("./pages/PrivacyPage"));
 const ProfilePage = React.lazy(() => import("./pages/ProfilePage"));
@@ -75,6 +76,10 @@ const router = createBrowserRouter([
       {
         path: "prints",
         element: <PrintsPage />,
+      },
+      {
+        path: "documentation",
+        element: <DocumentationPage />,
       },
       {
         path: "filament",

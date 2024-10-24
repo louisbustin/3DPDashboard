@@ -58,14 +58,14 @@ const PrinterDashboard = () => {
           "/prints" +
           (lastEvaluatedKey
             ? `?LastEvaluatedKey=${encodeURIComponent(
-                JSON.stringify(lastEvaluatedKey)
+                JSON.stringify(lastEvaluatedKey),
               )}`
             : ""),
         {
           headers: {
             Authorization: `Bearer ${bearerToken}`,
           },
-        }
+        },
       );
 
       p = await response.json();
@@ -76,7 +76,7 @@ const PrinterDashboard = () => {
         setPullNextPrints(false);
       }
       setLastEvaluatedKey(
-        p.LastEvaluatedKey ? { ...p.LastEvaluatedKey } : undefined
+        p.LastEvaluatedKey ? { ...p.LastEvaluatedKey } : undefined,
       );
       setShowLoadingDialog(false);
     };
@@ -114,7 +114,7 @@ const PrinterDashboard = () => {
   const onPieChartClick = (
     event: React.MouseEvent<SVGPathElement, MouseEvent>,
     itemIdentifier: PieItemIdentifier,
-    item: DefaultizedPieValueType
+    item: DefaultizedPieValueType,
   ) => {
     if (printFilter !== item.label) {
       setPrintFilter(item.label || "");
@@ -126,7 +126,7 @@ const PrinterDashboard = () => {
   const onDeletePrint = async (print: IPrint) => {
     setPrints((printArray) => {
       const newArray = printArray.filter(
-        (p) => p.insertedAt !== print.insertedAt
+        (p) => p.insertedAt !== print.insertedAt,
       );
       return [...newArray];
     });
@@ -287,7 +287,7 @@ const PrinterDashboard = () => {
                   onChange={
                     (v: Dayjs | null) =>
                       setMaxDateFilter(
-                        v ? v.unix() * 1000 + 86399999 : MAX_DATE
+                        v ? v.unix() * 1000 + 86399999 : MAX_DATE,
                       ) //Adding a day's (-1) amount of milliseconds to that the filters include that date
                   }
                   slotProps={{
@@ -306,7 +306,7 @@ const PrinterDashboard = () => {
               {minDateFilter > 0 && (
                 <Chip
                   label={`Inserted after ${new Date(
-                    minDateFilter
+                    minDateFilter,
                   ).toLocaleDateString()}`}
                   onDelete={() => setMinDateFilter(0)}
                   sx={{ marginRight: 1 }}
@@ -315,7 +315,7 @@ const PrinterDashboard = () => {
               {maxDateFilter < MAX_DATE && (
                 <Chip
                   label={`Inserted before ${new Date(
-                    maxDateFilter
+                    maxDateFilter,
                   ).toLocaleDateString()}`}
                   onDelete={() => setMaxDateFilter(MAX_DATE)}
                   sx={{ marginRight: 1 }}

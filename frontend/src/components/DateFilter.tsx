@@ -1,7 +1,7 @@
 import { Grid, Stack } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs, { Dayjs } from "dayjs";
-import React, { useEffect, useState } from "react";
+import React from "react";
 
 export const MAX_DATE = 9999999999999;
 export const MIN_DATE = 0;
@@ -9,23 +9,10 @@ export const MIN_DATE = 0;
 const DateFilter = (
   props: React.PropsWithoutRef<{
     onDatesChange?: (minDate: number, maxDate: number) => void;
-    initialMinDate?: number;
-    initialMaxDate?: number;
+    minDate: number;
+    maxDate: number;
   }>,
 ) => {
-  const [minDateFilter, setMinDateFilter] = useState<number>(
-    props.initialMinDate || MIN_DATE,
-  );
-  const [maxDateFilter, setMaxDateFilter] = useState<number>(
-    props.initialMaxDate || MAX_DATE,
-  );
-
-  useEffect(() => {
-    if (props.onDatesChange) {
-      props.onDatesChange(minDateFilter, maxDateFilter);
-    }
-  }, [minDateFilter, maxDateFilter, props]);
-
   return (
     <>
       <Grid item xs={6}>
@@ -34,29 +21,36 @@ const DateFilter = (
           <DatePicker
             sx={{ marginLeft: 2, marginRight: 2 }}
             onChange={(v: Dayjs | null) =>
-              setMinDateFilter(v ? v.unix() * 1000 : MIN_DATE)
+              props.onDatesChange &&
+              props.onDatesChange(
+                v ? v.startOf("day").unix() * 1000 : MIN_DATE,
+                props.maxDate || MAX_DATE,
+              )
             }
             slotProps={{
               field: { clearable: true },
             }}
-            value={minDateFilter > MIN_DATE ? dayjs(minDateFilter) : null}
+            value={props.minDate > MIN_DATE ? dayjs(props.minDate) : null}
             maxDate={
-              maxDateFilter < MIN_DATE ? undefined : dayjs(maxDateFilter)
+              props.maxDate < MIN_DATE ? undefined : dayjs(props.maxDate)
             }
           />
           to
           <DatePicker
             sx={{ marginLeft: 2 }}
-            onChange={
-              (v: Dayjs | null) =>
-                setMaxDateFilter(v ? v.unix() * 1000 + 86399999 : MAX_DATE) //Adding a day's (-1) amount of milliseconds to that the filters include that date
-            }
+            onChange={(v: Dayjs | null) => {
+              props.onDatesChange &&
+                props.onDatesChange(
+                  props.minDate || MIN_DATE,
+                  v ? v.endOf("day").unix() * 1000 : MAX_DATE,
+                );
+            }}
             slotProps={{
               field: { clearable: true },
             }}
-            value={maxDateFilter < MAX_DATE ? dayjs(maxDateFilter) : null}
+            value={props.maxDate < MAX_DATE ? dayjs(props.maxDate) : null}
             minDate={
-              minDateFilter > MAX_DATE ? undefined : dayjs(minDateFilter)
+              props.minDate > MAX_DATE ? undefined : dayjs(props.minDate)
             }
           />
         </Stack>

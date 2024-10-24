@@ -1,8 +1,8 @@
 import { DataGrid, GridActionsCellItem, GridColDef } from "@mui/x-data-grid";
-import IPrint from "../../models/IPrint";
+import IPrint, { getDefaultPrint } from "../../models/IPrint";
 import ImageHoverZoom from "../ImageHoverZoom";
 import moment from "moment";
-import { Tooltip } from "@mui/material";
+import { Fab, Tooltip } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditPrintDrawer from "../drawers/EditPrintDrawer";
@@ -11,6 +11,7 @@ import ConfirmationDialog from "../ConfirmationDialog";
 import LoadingDialog from "../LoadingDialog";
 import useAPIToken from "../../hooks/use-api-token";
 import usePrinters from "../../hooks/use-printers";
+import AddIcon from "@mui/icons-material/Add";
 
 const apiURL = `${process.env.REACT_APP_API_BASE_URL}prints/`;
 
@@ -19,10 +20,12 @@ const PrintsGrid = (
     prints: IPrint[];
     allowEdit?: boolean;
     allowDelete?: boolean;
+    allowAdd?: boolean;
+    onInsertSuccess?: (newPrint: IPrint) => void;
     onEditSuccess?: (editedPrint: IPrint) => void;
     onDeleteSuccess?: (deletedPrint: IPrint) => void;
     includePrinterName?: boolean;
-  }>
+  }>,
 ) => {
   const [showEditPrintDrawer, setShowEditPrintDrawer] = useState(false);
   const [selectedPrint, setSelectedPrint] = useState<IPrint | null>(null);
@@ -79,8 +82,8 @@ const PrintsGrid = (
     {
       field: "insertedAt",
       headerName: "Added At",
-      valueGetter: (params) =>
-        moment(params.row.insertedAt).format("YYYY-MM-DD"),
+      valueFormatter: (field) =>
+        moment(Number(field.value)).format("YYYY-MM-DD"),
     },
     {
       field: "actions",
@@ -101,7 +104,7 @@ const PrintsGrid = (
                   setShowEditPrintDrawer(true);
                 }}
               />
-            </Tooltip>
+            </Tooltip>,
           );
         }
         if (props.allowDelete) {
@@ -116,7 +119,7 @@ const PrintsGrid = (
                 }}
                 color="inherit"
               />
-            </Tooltip>
+            </Tooltip>,
           );
         }
         return actions;
@@ -157,52 +160,70 @@ const PrintsGrid = (
   return (
     <>
       <LoadingDialog open={isLoading}></LoadingDialog>
-      {props.prints && (
-        <>
-          <DataGrid
-            rows={props.prints}
-            columns={columns}
-            initialState={{
-              pagination: {
-                paginationModel: { page: 0, pageSize: 10 },
-              },
-              sorting: {
-                sortModel: [{ field: "insertedAt", sort: "desc" }],
-              },
-            }}
-            pageSizeOptions={[10, 50, 100]}
-            sx={{ marginTop: 2, marginLeft: 3 }}
-            autoHeight
-            getRowId={(row) => row.insertedAt}
-          />
-          {selectedPrint && props.allowEdit && (
-            <EditPrintDrawer
-              open={showEditPrintDrawer}
-              printerId={selectedPrint.printerId}
-              print={selectedPrint}
-              onClose={(didUpdate, updatedPrint) => {
-                if (didUpdate && updatedPrint) {
-                  props.onEditSuccess && props.onEditSuccess(updatedPrint);
-                }
-                setShowEditPrintDrawer(false);
+      <div>
+        {props.prints && (
+          <>
+            <DataGrid
+              rows={props.prints}
+              columns={columns}
+              initialState={{
+                pagination: {
+                  paginationModel: { page: 0, pageSize: 10 },
+                },
+                sorting: {
+                  sortModel: [{ field: "insertedAt", sort: "desc" }],
+                },
               }}
-            ></EditPrintDrawer>
-          )}
-          <ConfirmationDialog
-            open={showDeletePrintDialog}
-            onCancel={() => {
-              setShowDeletePrintDialog(false);
-              setPrintToDelete(null);
-            }}
-            onConfirm={() => {
-              deletePrint(printToDelete!);
+              pageSizeOptions={[10, 50, 100]}
+              sx={{ marginTop: 2, marginLeft: 3 }}
+              autoHeight
+              getRowId={(row) => row.insertedAt}
+            />
+            {selectedPrint && props.allowEdit && (
+              <EditPrintDrawer
+                open={showEditPrintDrawer}
+                printerId={selectedPrint.printerId}
+                print={selectedPrint}
+                onClose={(action, updatedPrint) => {
+                  if (action && action === "update" && updatedPrint) {
+                    props.onEditSuccess && props.onEditSuccess(updatedPrint);
+                  }
+                  if (action && action === "insert" && updatedPrint) {
+                    props.onInsertSuccess &&
+                      props.onInsertSuccess(updatedPrint);
+                  }
+                  setShowEditPrintDrawer(false);
+                }}
+              ></EditPrintDrawer>
+            )}
+            <ConfirmationDialog
+              open={showDeletePrintDialog}
+              onCancel={() => {
+                setShowDeletePrintDialog(false);
+                setPrintToDelete(null);
+              }}
+              onConfirm={() => {
+                deletePrint(printToDelete!);
+              }}
+            >
+              Are you sure you want to delete this print? This action cannot be
+              undone.
+            </ConfirmationDialog>
+          </>
+        )}
+        {props.allowAdd && (
+          <Fab
+            size="medium"
+            sx={{ position: "absolute", bottom: 32, right: 32 }}
+            onClick={() => {
+              setSelectedPrint(getDefaultPrint());
+              setShowEditPrintDrawer(true);
             }}
           >
-            Are you sure you want to delete this print? This action cannot be
-            undone.
-          </ConfirmationDialog>
-        </>
-      )}
+            <AddIcon />
+          </Fab>
+        )}
+      </div>
     </>
   );
 };
