@@ -8,16 +8,17 @@ import ShrunkTextField from "../formelements/ShrunkTextField";
 import IPrint, { Status, getDefaultPrint } from "../../models/IPrint";
 import StyledSelect from "../formelements/StyledSelect";
 import FilamentSelection from "../formelements/FilamentSelection";
+import PrinterSelection from "../formelements/PrinterSelection";
 
 const printApiURL = `${process.env.REACT_APP_API_BASE_URL}prints`;
 
 const EditPrintDrawer = (
   props: PropsWithChildren<{
     open: boolean;
-    onClose?: (updateOccurred?: boolean, print?: IPrint) => void;
+    onClose?: (action?: "update" | "insert" | "none", print?: IPrint) => void;
     printerId: string;
     print?: IPrint;
-  }>
+  }>,
 ) => {
   const [isLoading, setIsLoading] = useState(false);
   const [print, setPrint] = useState<IPrint>(getDefaultPrint());
@@ -43,6 +44,13 @@ const EditPrintDrawer = (
       return { ...f, filamentId };
     });
   };
+
+  const onChangePrinter = (printerId: string) => {
+    setPrint((f) => {
+      return { ...f, printerId };
+    });
+  };
+
   const onChangeStatus = (status: Status) => {
     setPrint((f) => {
       return { ...f, PrintStatus: status };
@@ -54,21 +62,30 @@ const EditPrintDrawer = (
     });
   };
   const handleClose = (updateOccurred: boolean) => {
+    const action = print.PrintId ? "update" : "insert";
     if (props.onClose)
-      props.onClose(updateOccurred, updateOccurred ? print : undefined);
+      props.onClose(
+        updateOccurred ? action : "none",
+        updateOccurred ? print : undefined,
+      );
     //clear out any saved filaments when we close the dialog
     setPrint(getDefaultPrint());
   };
 
   const savePrint = async () => {
     setIsLoading(true);
-    const response = await fetch(`${printApiURL}/${print.PrintId}`, {
-      method: "POST",
-      body: JSON.stringify(print),
-      headers: { Authorization: `Bearer ${bearerToken}` },
-    });
+    const response = await fetch(
+      `${printApiURL}/${print.PrintId ? print.PrintId : ""}`,
+      {
+        method: "POST",
+        body: JSON.stringify(print),
+        headers: { Authorization: `Bearer ${bearerToken}` },
+      },
+    );
     if (response.ok) {
-      setSuccessMessage("Print updated successfully.");
+      setSuccessMessage(
+        `Print ${print.PrintId ? "updated" : "created"} successfully.`,
+      );
       handleClose(true);
       setTimeout(() => setSuccessMessage(""), 5000);
     } else {
@@ -108,17 +125,22 @@ const EditPrintDrawer = (
             <MenuItem value="Active">Active</MenuItem>
             <MenuItem value="Failed">Failed</MenuItem>
           </StyledSelect>
+          <PrinterSelection
+            required={true}
+            printerId={print.printerId}
+            onChange={onChangePrinter}
+          />
           <ShrunkTextField
             required
-            id="amount"
-            label="Amount Used"
-            value={print.amountUsed}
-            onChange={(e) => onChangeAmount(e.target.value)}
+            id="filename-input"
+            label="File Name"
+            value={print.FileName}
+            onChange={(e) =>
+              setPrint((print) => {
+                return { ...print, FileName: e.target.value };
+              })
+            }
           />
-          <FilamentSelection
-            onChange={onChangeFilament}
-            filamentId={print.filamentId || ""}
-          ></FilamentSelection>
           <ShrunkTextField
             id="duration"
             label="Duration (secs)"
@@ -126,6 +148,18 @@ const EditPrintDrawer = (
             onChange={(e) => onChangeDuration(Number(e.target.value))}
             type="number"
           />
+          <ShrunkTextField
+            required
+            id="amount"
+            label="Amount Used"
+            value={print.amountUsed}
+            onChange={(e) => onChangeAmount(e.target.value)}
+            type="number"
+          />
+          <FilamentSelection
+            onChange={onChangeFilament}
+            filamentId={print.filamentId || ""}
+          ></FilamentSelection>
         </Stack>
       </EditDrawer>
     </>

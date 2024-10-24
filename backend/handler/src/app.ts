@@ -12,7 +12,7 @@ import {
 import { getFilamentByIdAPIResponse } from "./services/filaments";
 
 export const lambdaHandler = async (
-  event: APIGatewayProxyEvent
+  event: APIGatewayProxyEvent,
 ): Promise<APIGatewayProxyResult> => {
   dotenv.config();
 
@@ -24,6 +24,7 @@ export const lambdaHandler = async (
         await getBaseResponse(HTTP_STATUS.OK, [
           HTTP_METHOD.OPTIONS,
           HTTP_METHOD.GET,
+          HTTP_METHOD.POST,
         ]),
       authenticationRequired: false,
     },
@@ -31,6 +32,12 @@ export const lambdaHandler = async (
       path: "/prints",
       method: HTTP_METHOD.GET,
       handler: getPrintsByUserAPIResponse,
+      authenticationRequired: true,
+    },
+    {
+      path: "/prints",
+      method: HTTP_METHOD.POST,
+      handler: savePrintsAPIResponse,
       authenticationRequired: true,
     },
     {

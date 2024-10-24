@@ -335,6 +335,11 @@ Resources:
           Properties:
             Path: /prints
             Method: options
+        PrintsPost:
+          Type: Api
+          Properties:
+            Path: /prints
+            Method: POST
         PrintsByIdGet:
           Type: Api
           Properties:

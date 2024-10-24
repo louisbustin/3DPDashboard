@@ -4,15 +4,14 @@ import MessageBanner from "../components/MessageBanner";
 import PrintsGrid from "../components/grids/PrintsGrid";
 import usePrints from "../hooks/use-prints";
 import DateFilter from "../components/DateFilter";
-
-const oneWeek = 1000 * 60 * 60 * 24 * 7;
+import dayjs from "dayjs";
 
 const PrintsPage = () => {
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [minMaxDate, setMinMaxDate] = useState({
-    minDate: Date.now() - oneWeek,
-    maxDate: Date.now(),
+    minDate: dayjs().subtract(1, "week").startOf("day").unix() * 1000,
+    maxDate: dayjs().endOf("day").unix() * 1000,
   });
 
   const { prints, isLoading, refresh } = usePrints({
@@ -37,15 +36,19 @@ const PrintsPage = () => {
             onDatesChange={(min, max) => {
               setMinMaxDate({ minDate: min, maxDate: max });
             }}
-            initialMinDate={Date.now() - oneWeek}
-            initialMaxDate={Date.now()}
+            minDate={minMaxDate.minDate}
+            maxDate={minMaxDate.maxDate}
           ></DateFilter>
           <PrintsGrid
             prints={prints}
+            onInsertSuccess={() => {
+              refresh();
+            }}
             onEditSuccess={() => refresh()}
             onDeleteSuccess={() => refresh()}
             allowDelete={true}
             allowEdit={true}
+            allowAdd={true}
             includePrinterName={true}
           ></PrintsGrid>
         </>

@@ -5,6 +5,7 @@ import HomeIcon from "@mui/icons-material/Home";
 import PrivacyTipIcon from "@mui/icons-material/PrivacyTip";
 import ContactPageIcon from "@mui/icons-material/ContactPage";
 import StickyNote2Icon from "@mui/icons-material/StickyNote2";
+import HelpIcon from "@mui/icons-material/Help";
 import Paper from "@mui/material/Paper";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -25,6 +26,9 @@ const Footer = () => {
       break;
     case "/privacy":
       activeTab = 3;
+      break;
+    case "/documentation":
+      activeTab = 4;
       break;
   }
 
@@ -51,6 +55,9 @@ const Footer = () => {
               case 3:
                 navigate("/privacy");
                 break;
+              case 4:
+                navigate("/documentation");
+                break;
               default:
                 break;
             }
@@ -62,6 +69,7 @@ const Footer = () => {
           <BottomNavigationAction label="Contact" icon={<ContactPageIcon />} />
           <BottomNavigationAction label="Terms" icon={<StickyNote2Icon />} />
           <BottomNavigationAction label="Privacy" icon={<PrivacyTipIcon />} />
+          <BottomNavigationAction label="Help" icon={<HelpIcon />} />
         </BottomNavigation>
       </Paper>
     </>

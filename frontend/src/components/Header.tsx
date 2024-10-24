@@ -19,6 +19,7 @@ const pages = [
   //{ name: "Resin", link: "/resin" },
   { name: "Printers", link: "/dashboard/printers" },
   { name: "Prints", link: "/prints" },
+  { name: "Docs", link: "/documentation" },
 ];
 
 const Header = () => {
