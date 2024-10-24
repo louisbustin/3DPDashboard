@@ -2,7 +2,7 @@ import { DataGrid, GridActionsCellItem, GridColDef } from "@mui/x-data-grid";
 import IPrint, { getDefaultPrint } from "../../models/IPrint";
 import ImageHoverZoom from "../ImageHoverZoom";
 import moment from "moment";
-import { Fab, Tooltip } from "@mui/material";
+import { Fab, Tooltip, Grid } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditPrintDrawer from "../drawers/EditPrintDrawer";
@@ -160,7 +160,7 @@ const PrintsGrid = (
   return (
     <>
       <LoadingDialog open={isLoading}></LoadingDialog>
-      <div>
+      <Grid xs={12}>
         {props.prints && (
           <>
             <DataGrid
@@ -223,7 +223,7 @@ const PrintsGrid = (
             <AddIcon />
           </Fab>
         )}
-      </div>
+      </Grid>
     </>
   );
 };
