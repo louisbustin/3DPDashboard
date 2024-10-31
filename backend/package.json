@@ -1,17 +1,17 @@
 {
-	"scripts": {
-		"start": "nodemon --exec sam build",
-		"localapi": "sam local start-api -p 3001"
-	},
-	"dependencies": {
-		"@aws-sdk/client-dynamodb": "^3.427.0",
-		"@aws-sdk/lib-dynamodb": "^3.427.0",
-		"aws-lambda": "^1.0.7",
-		"jsonwebtoken": "^9.0.2",
-		"uuid": "^9.0.1"
-	},
-	"devDependencies": {
-		"@types/aws-lambda": "^8.10.145",
-		"nodemon": "^3.0.1"
-	}
+  "scripts": {
+    "start": "nodemon --exec sam build",
+    "localapi": "sam local start-api -p 3001 -t template.yaml"
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.427.0",
+    "@aws-sdk/lib-dynamodb": "^3.427.0",
+    "aws-lambda": "^1.0.7",
+    "jsonwebtoken": "^9.0.2",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.145",
+    "nodemon": "^3.0.1"
+  }
 }
