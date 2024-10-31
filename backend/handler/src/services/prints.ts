@@ -2,7 +2,7 @@ import { getDynamoDBClient } from "../util/db";
 import getBaseResponse from "../util/base-reponse";
 import { HTTP_STATUS } from "../util/http-constants";
 import { RouterHandler } from "../util/router";
-import { QueryCommand } from "@aws-sdk/client-dynamodb";
+import { AttributeValue, QueryCommand } from "@aws-sdk/client-dynamodb";
 import { unmarshall } from "@aws-sdk/util-dynamodb";
 import { DeleteCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
 import { v4 } from "uuid";
@@ -10,7 +10,7 @@ import { v4 } from "uuid";
 export const getPrintsByUser = async (
   usersub: string,
   startDate: number,
-  endDate: number,
+  endDate: number
 ) => {
   const dynamo = getDynamoDBClient();
 
@@ -33,10 +33,38 @@ export const getPrintsByUser = async (
   }
 };
 
+const getPrintsByPrinter = async (
+  printerId: string,
+  usersub: string,
+  ExclusiveStartKey?: Record<string, AttributeValue>
+) => {
+  const dynamo = getDynamoDBClient();
+
+  const command = new QueryCommand({
+    TableName: "3dpdashboard_prints",
+    KeyConditionExpression: "printerId = :printerid",
+    ExpressionAttributeValues: {
+      ":printerid": { S: printerId },
+      ":usersub": { S: usersub },
+    },
+    ExclusiveStartKey,
+    ScanIndexForward: false,
+    Limit: 50,
+    FilterExpression: "usersub = :usersub",
+  });
+
+  const response = await dynamo.send(command);
+
+  return {
+    LastEvaluatedKey: response.LastEvaluatedKey,
+    data: response.Items?.map((i) => unmarshall(i)),
+  };
+};
+
 const savePrint = async (
   printStr: string,
   usersub: string,
-  pathId?: string,
+  pathId?: string
 ) => {
   const print = JSON.parse(printStr);
 
@@ -179,7 +207,7 @@ export const savePrintsAPIResponse: RouterHandler = async (context) => {
     const result = await savePrint(
       print,
       context.usersub,
-      context.event.pathParameters?.id,
+      context.event.pathParameters?.id
     );
   } catch (e) {
     console.error(e);
@@ -204,4 +232,27 @@ export const deletePrintsAPIResponse: RouterHandler = async (context) => {
     return await getBaseResponse(HTTP_STATUS.INTERNAL_SERVER_ERROR);
   }
   return await getBaseResponse(HTTP_STATUS.OK);
+};
+
+export const getPrintsByPrinterIdAPIResponse: RouterHandler = async (
+  context
+) => {
+  try {
+    if (!context.event.pathParameters?.id) {
+      return await getBaseResponse(HTTP_STATUS.BAD_REQUEST);
+    }
+    const prints = await getPrintsByPrinter(
+      context.event.pathParameters.id,
+      context.usersub,
+      context.event.queryStringParameters?.LastEvaluatedKey
+        ? JSON.parse(context.event.queryStringParameters?.LastEvaluatedKey)
+        : undefined
+    );
+    const response = await getBaseResponse(HTTP_STATUS.OK);
+    response.body = JSON.stringify(prints);
+    return response;
+  } catch (error) {
+    console.error(error);
+    return await getBaseResponse(HTTP_STATUS.INTERNAL_SERVER_ERROR);
+  }
 };
