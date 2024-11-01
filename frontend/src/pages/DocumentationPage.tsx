@@ -1,6 +1,7 @@
 import { Box } from "@mui/material";
 import NormalLink from "../components/links/NormalLink";
 import { Link } from "react-router-dom";
+import SiteStatus from "../components/SiteStatus";
 
 const DocumentationPage = () => {
   return (
@@ -123,11 +124,14 @@ const DocumentationPage = () => {
         Notifications". Click on "Custom Webhook" and set the URL to
         "https://api.3dpdashboard.com/logprint"
       </Box>
-      <Box></Box>
       <h2>Support</h2>
       <Box>
         If you have any questions or need support, please reach out to us at via
         our <NormalLink to="/contact">Contact</NormalLink> page.
+      </Box>
+      <h2>Dev Status</h2>
+      <Box marginTop={2}>
+        <SiteStatus />
       </Box>
     </>
   );

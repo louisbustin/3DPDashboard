@@ -1,5 +1,6 @@
 import { Box, Container, Stack, Typography } from "@mui/material";
 import printer from "../images/3dprinter1.webp";
+import SiteStatus from "./SiteStatus";
 
 const HomePageNoAuth = () => {
   return (
@@ -19,18 +20,8 @@ const HomePageNoAuth = () => {
                 an account on the login screen and then get to work adding your
                 printers and filaments.
               </Typography>
-              <Typography>Current working items:</Typography>
-              <ul>
-                <li>Filament add/update/delete.</li>
-                <li>Printer add/update/delete</li>
-              </ul>
-              <Typography>Coming soon:</Typography>
-              <ul>
-                <li>Resin add/update/delete.</li>
-                <li>
-                  Print logging. Log prints, filament used, and time taken.
-                </li>
-              </ul>
+              <h2>Dev Status</h2>
+              <SiteStatus />
             </Stack>
             <img
               src={printer}
