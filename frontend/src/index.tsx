@@ -107,14 +107,15 @@ const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
 
+console.log(process.env);
 root.render(
   <React.StrictMode>
     <Auth0Provider
-      domain="eforge.us.auth0.com"
-      clientId="LXfZEH7bDbnOShzJrGNxERdtUyWyjpzc"
+      domain={process.env.REACT_APP_AUTH0_DOMAIN || ""}
+      clientId={process.env.REACT_APP_AUTH0_CLIENTID || ""}
       authorizationParams={{
         redirect_uri: window.location.href,
-        audience: "https://api.3dpdashboard.com/",
+        audience: `${process.env.REACT_APP_AUTH0_AUDIENCE || ""}`,
       }}
     >
       <Suspense fallback={<LoadingDialog open={true} />}>
