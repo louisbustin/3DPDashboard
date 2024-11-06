@@ -11,6 +11,8 @@ export default interface IFilament {
   color: string;
   filamentStatus?: FilamentStatus;
   colorCode?: string;
+  reorderThreshold?: number;
+  numberOfSpools?: number;
 }
 
 export enum FilamentStatus {
@@ -31,5 +33,7 @@ export const getDefaultFilament = (): IFilament => {
     highBedTemp: 0,
     color: "",
     filamentStatus: FilamentStatus.Active,
+    reorderThreshold: 0,
+    numberOfSpools: 0,
   };
 };

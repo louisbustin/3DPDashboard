@@ -50,8 +50,10 @@ const EditFilamentDrawer = (
       // Click on the text field when done loading
       document.getElementById("brand")?.focus();
     };
-    getFilament();
-  }, [props.filamentId, bearerToken]);
+    if (props.open) {
+      getFilament();
+    }
+  }, [props.filamentId, bearerToken, props.open]);
 
   const onChangeBrand = (brand: string) => {
     setFilament((f) => {
@@ -109,6 +111,16 @@ const EditFilamentDrawer = (
       return { ...f, filamentStatus: Number(status) };
     });
   };
+  const onChangeReorderThreshold = (threshold: number) => {
+    setFilament((f) => {
+      return { ...f, reorderThreshold: Number(threshold) };
+    })
+  }
+  const onChangeNumOfSpools = (numOfSpools: number) => {
+    setFilament((f) => {
+      return { ...f, numberOfSpools: Number(numOfSpools) };
+    })
+  }
   const handleClose = (updateOccurred: boolean) => {
     if (props.onClose) props.onClose(updateOccurred);
     //clear out any saved filaments when we close the dialog
@@ -185,6 +197,20 @@ const EditFilamentDrawer = (
             label="Type"
             value={filament.type}
             onChange={(e) => onChangeType(e.target.value)}
+          />
+          <ShrunkTextField
+            id="threshold"
+            label="Reorder Threshold"
+            value={filament.reorderThreshold || 0}
+            type="number"
+            onChange={(e) => onChangeReorderThreshold(Number(e.target.value))}
+          />
+          <ShrunkTextField
+            id="numOfSpools"
+            label="Current Spools"
+            value={ filament.numberOfSpools || 0}
+            type="number"
+            onChange={(e) => onChangeNumOfSpools(Number(e.target.value))}
           />
           <ShrunkTextField
             id="weight"
