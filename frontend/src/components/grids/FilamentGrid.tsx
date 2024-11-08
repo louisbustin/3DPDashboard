@@ -13,6 +13,7 @@ import _ from "lodash";
 import ConfirmationDialog from "../ConfirmationDialog";
 import LoadingDialog from "../LoadingDialog";
 import MessageBanner from "../MessageBanner";
+import ShrunkTextField from "../formelements/ShrunkTextField";
 
 const apiURL = `${process.env.REACT_APP_API_BASE_URL}filament`;
 
@@ -21,7 +22,9 @@ const FilamentGrid = (props: PropsWithoutRef<{
   onDeleteSuccess?: () => void,
   onEditSuccess?: () => void,
   allowDelete?: boolean,
-  allowEdit?: boolean
+  allowEdit?: boolean,
+  allowAdd?: boolean,
+  allowInactive?: boolean,
   showSpoolAddRemove?: boolean
 }>) => {
   const [selectedRowId, setSelectedRowId] = useState("");
@@ -32,6 +35,7 @@ const FilamentGrid = (props: PropsWithoutRef<{
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const bearerToken = useAPIToken();
+  const [filter, setfilter] = useState("");
 
   const openDrawer = (id?: string) => {
     setSelectedRowId(id || "");
@@ -118,13 +122,13 @@ const FilamentGrid = (props: PropsWithoutRef<{
             />
           </Tooltip>);
 
-          actions.push(<Tooltip title="Remove Spool" enterDelay={1000}>
+          actions.push(<Tooltip title="Remove Spool" enterDelay={1000}><span>
             <GridActionsCellItem
               icon={<RemoveCircleOutline/>}
               label="Remove Spool"
               onClick={() => removeSpool(params.row)}
               disabled={(params.row.numberOfSpools || 0) < 1}
-            />
+            /></span>
           </Tooltip>);
         }
         if (props.allowEdit) {
@@ -170,19 +174,21 @@ const FilamentGrid = (props: PropsWithoutRef<{
       }}
       filamentId={_.clone(selectedRowId)}
     />
-    <Stack direction="row" spacing={0.5} justifyContent="flex-end">
-      <FormControlLabel
-        control={
-          <Checkbox
-            onChange={(e) => setShowInactive(e.target.checked)}
-          ></Checkbox>
-        }
-        label="Show Inactive"
-      ></FormControlLabel>
-      <Button onClick={() => openDrawer()} aria-label="Add">
-        <AddIcon/>
-      </Button>
-    </Stack>
+    {(props.allowAdd || props.allowInactive) &&
+        <Stack direction="row" spacing={0.5} justifyContent="flex-end">
+            <ShrunkTextField label="Search" sx={{paddingBottom: 1}} onChange={(e) => setfilter(e.target.value)}/>
+            <FormControlLabel
+                control={
+                  <Checkbox
+                    onChange={(e) => setShowInactive(e.target.checked)}
+                  ></Checkbox>
+                }
+                label="Show Inactive"
+            ></FormControlLabel>
+            <Button onClick={() => openDrawer()} aria-label="Add">
+                <AddIcon/>
+            </Button>
+        </Stack>}
     <ConfirmationDialog
       open={deleteDialogOpen}
       onCancel={() => setDeleteDialogOpen(false)}
@@ -196,11 +202,18 @@ const FilamentGrid = (props: PropsWithoutRef<{
       this filament?
     </ConfirmationDialog>
     <DataGrid
-      rows={props.data.filter((i) =>
-        !showInactive
-          ? i.filamentStatus === FilamentStatus.Active ||
-          i.filamentStatus === undefined
-          : true,
+      rows={props.data.filter((i) => {
+          return (!showInactive
+              ? i.filamentStatus === FilamentStatus.Active ||
+              i.filamentStatus === undefined
+              : true)
+            && (
+              filter === ""
+              || i.name.toLowerCase().includes(filter.toLowerCase())
+              || i.brand.toLowerCase().includes(filter.toLowerCase())
+              || i.color.toLowerCase().includes(filter.toLowerCase())
+            );
+        }
       )}
       columns={columns}
       initialState={{

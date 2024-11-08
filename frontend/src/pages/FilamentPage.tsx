@@ -15,7 +15,8 @@ const FilamentPage = () => {
         onEditSuccess={() => refresh()}
         allowDelete
         allowEdit
-        showSpoolAddRemove
+        allowAdd
+        allowInactive
       />
     </>
   );

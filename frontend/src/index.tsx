@@ -1,12 +1,12 @@
-import React, { Suspense } from "react";
+import React, {Suspense} from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
 import App from "./App";
-import { Auth0Provider } from "@auth0/auth0-react";
+import {Auth0Provider} from "@auth0/auth0-react";
 import reportWebVitals from "./reportWebVitals";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import {createBrowserRouter, RouterProvider} from "react-router-dom";
 import HomePage from "./pages/HomePage";
-import { AuthenticationGuard } from "./components/AuthenticationGuard";
+import {AuthenticationGuard} from "./components/AuthenticationGuard";
 
 import "@fontsource/roboto/300.css";
 import "@fontsource/roboto/400.css";
@@ -30,29 +30,30 @@ const PrinterDashboard = React.lazy(
 const PrintersDashboard = React.lazy(
   () => import("./components/dashboards/PrintersDashboard")
 );
+const InventoryPage = React.lazy(() => import("./pages/InventoryPage"));
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <App />,
-    errorElement: <ErrorPage />,
+    element: <App/>,
+    errorElement: <ErrorPage/>,
     children: [
       {
         path: "",
-        element: <HomePage />,
+        element: <HomePage/>,
       },
       {
         path: "dashboard",
         children: [
           {
             path: "printers",
-            element: <AuthenticationGuard component={PrintersDashboard} />,
+            element: <AuthenticationGuard component={PrintersDashboard}/>,
           },
           {
             path: "printers/:printerid",
-            element: <AuthenticationGuard component={PrinterDashboard} />,
+            element: <AuthenticationGuard component={PrinterDashboard}/>,
           },
-          { path: "", element: <HomePage /> },
+          {path: "", element: <HomePage/>},
         ],
       },
       {
@@ -63,28 +64,34 @@ const router = createBrowserRouter([
       },
       {
         path: "terms",
-        element: <TermsPage />,
+        element: <TermsPage/>,
       },
       {
         path: "privacy",
-        element: <PrivacyPage />,
+        element: <PrivacyPage/>,
       },
       {
         path: "contact",
-        element: <ContactPage />,
+        element: <ContactPage/>,
       },
       {
         path: "prints",
-        element: <PrintsPage />,
+        element: <PrintsPage/>,
       },
       {
         path: "documentation",
-        element: <DocumentationPage />,
+        element: <DocumentationPage/>,
       },
       {
         path: "filament",
         element: (
           <AuthenticationGuard component={FilamentPage}></AuthenticationGuard>
+        ),
+      },
+      {
+        path: "inventory",
+        element: (
+          <AuthenticationGuard component={InventoryPage}></AuthenticationGuard>
         ),
       },
       {
@@ -117,8 +124,8 @@ root.render(
         audience: `${process.env.REACT_APP_AUTH0_AUDIENCE || ""}`,
       }}
     >
-      <Suspense fallback={<LoadingDialog open={true} />}>
-        <RouterProvider router={router} />
+      <Suspense fallback={<LoadingDialog open={true}/>}>
+        <RouterProvider router={router}/>
       </Suspense>
     </Auth0Provider>
   </React.StrictMode>
