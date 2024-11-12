@@ -1,12 +1,12 @@
-import { DataGrid, GridActionsCellItem, GridColDef } from "@mui/x-data-grid";
-import IPrint, { getDefaultPrint } from "../../models/IPrint";
+import {DataGrid, GridActionsCellItem, GridColDef} from "@mui/x-data-grid";
+import IPrint, {getDefaultPrint} from "../../models/IPrint";
 import ImageHoverZoom from "../ImageHoverZoom";
 import moment from "moment";
-import { Fab, Tooltip, Grid } from "@mui/material";
+import {Fab, Tooltip, Grid} from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditPrintDrawer from "../drawers/EditPrintDrawer";
-import { useState } from "react";
+import {useState} from "react";
 import ConfirmationDialog from "../ConfirmationDialog";
 import LoadingDialog from "../LoadingDialog";
 import useAPIToken from "../../hooks/use-api-token";
@@ -32,7 +32,7 @@ const PrintsGrid = (
   const [showDeletePrintDialog, setShowDeletePrintDialog] = useState(false);
   const [printToDelete, setPrintToDelete] = useState<IPrint | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const { printers } = usePrinters();
+  const {printers} = usePrinters();
 
   const apiToken = useAPIToken();
 
@@ -62,8 +62,8 @@ const PrintsGrid = (
         return <></>;
       },
     },
-    { field: "PrintStatus", headerName: "Status" },
-    { field: "FileName", headerName: "File Name", flex: 1 },
+    {field: "PrintStatus", headerName: "Status"},
+    {field: "FileName", headerName: "File Name", flex: 1},
     {
       field: "DurationSec",
       headerName: "Duration",
@@ -78,7 +78,7 @@ const PrintsGrid = (
         return timeString;
       },
     },
-    { field: "amountUsed", headerName: "Amount Used" },
+    {field: "amountUsed", headerName: "Amount Used"},
     {
       field: "insertedAt",
       headerName: "Added At",
@@ -97,7 +97,7 @@ const PrintsGrid = (
           actions.push(
             <Tooltip title="Edit" enterDelay={1000}>
               <GridActionsCellItem
-                icon={<EditIcon />}
+                icon={<EditIcon/>}
                 label="Edit"
                 onClick={() => {
                   setSelectedPrint(p.row);
@@ -111,7 +111,7 @@ const PrintsGrid = (
           actions.push(
             <Tooltip title="Delete" enterDelay={1000}>
               <GridActionsCellItem
-                icon={<DeleteIcon />}
+                icon={<DeleteIcon/>}
                 label="Delete"
                 onClick={() => {
                   setPrintToDelete(p.row);
@@ -145,7 +145,7 @@ const PrintsGrid = (
 
     const response = await fetch(apiURL + print.PrintId, {
       method: "DELETE",
-      headers: { Authorization: `Bearer ${apiToken}` },
+      headers: {Authorization: `Bearer ${apiToken}`},
     });
     if (response.ok) {
       props.onDeleteSuccess && props.onDeleteSuccess(print);
@@ -160,7 +160,7 @@ const PrintsGrid = (
   return (
     <>
       <LoadingDialog open={isLoading}></LoadingDialog>
-      <Grid xs={12}>
+      <Grid width="100%">
         {props.prints && (
           <>
             <DataGrid
@@ -168,14 +168,14 @@ const PrintsGrid = (
               columns={columns}
               initialState={{
                 pagination: {
-                  paginationModel: { page: 0, pageSize: 10 },
+                  paginationModel: {page: 0, pageSize: 10},
                 },
                 sorting: {
-                  sortModel: [{ field: "insertedAt", sort: "desc" }],
+                  sortModel: [{field: "insertedAt", sort: "desc"}],
                 },
               }}
               pageSizeOptions={[10, 50, 100]}
-              sx={{ marginTop: 2, marginLeft: 3 }}
+              sx={{marginTop: 2, marginLeft: 3}}
               autoHeight
               getRowId={(row) => row.insertedAt}
             />
@@ -190,7 +190,7 @@ const PrintsGrid = (
                   }
                   if (action && action === "insert" && updatedPrint) {
                     props.onInsertSuccess &&
-                      props.onInsertSuccess(updatedPrint);
+                    props.onInsertSuccess(updatedPrint);
                   }
                   setShowEditPrintDrawer(false);
                 }}
@@ -214,13 +214,13 @@ const PrintsGrid = (
         {props.allowAdd && (
           <Fab
             size="medium"
-            sx={{ position: "absolute", bottom: 32, right: 32 }}
+            sx={{position: "absolute", bottom: 32, right: 32}}
             onClick={() => {
               setSelectedPrint(getDefaultPrint());
               setShowEditPrintDrawer(true);
             }}
           >
-            <AddIcon />
+            <AddIcon/>
           </Fab>
         )}
       </Grid>

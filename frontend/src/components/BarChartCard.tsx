@@ -1,8 +1,8 @@
-import { BarChart } from "@mui/x-charts";
-import { BarChartProps } from "@mui/x-charts/BarChart/BarChart";
+import {BarChart} from "@mui/x-charts";
+import {BarChartProps} from "@mui/x-charts/BarChart/BarChart";
 import Typography from "@mui/material/Typography";
-import { PropsWithoutRef } from "react";
-import { Card } from "@mui/material";
+import {PropsWithoutRef} from "react";
+import {Card} from "@mui/material";
 
 const BarChartCard = (
   props: PropsWithoutRef<{
@@ -15,7 +15,7 @@ const BarChartCard = (
   }>
 ) => {
   return (
-    <Card sx={{ pt: 1, pb: 1 }}>
+    <Card sx={{pt: 1, pb: 1}}>
       <Typography
         variant="subtitle2"
         sx={{
@@ -25,7 +25,7 @@ const BarChartCard = (
       >
         {props.title}
       </Typography>
-      <BarChart {...props.barCharProps} sx={{ align: "center" }} />
+      <BarChart {...props.barCharProps} sx={{align: "center"}}/>
     </Card>
   );
 };
