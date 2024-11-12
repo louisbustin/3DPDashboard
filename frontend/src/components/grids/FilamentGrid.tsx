@@ -1,5 +1,5 @@
 import {PropsWithoutRef, useState} from "react";
-import IFilament, {FilamentStatus} from "../../models/IFilament";
+import IFilament, {FilamentStatus, FilamentType, filamentTypes} from "../../models/IFilament";
 import {DataGrid, GridActionsCellItem, GridColDef} from "@mui/x-data-grid";
 import {Button, Checkbox, FormControlLabel, Stack, Tooltip} from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
@@ -14,6 +14,8 @@ import ConfirmationDialog from "../ConfirmationDialog";
 import LoadingDialog from "../LoadingDialog";
 import MessageBanner from "../MessageBanner";
 import ShrunkTextField from "../formelements/ShrunkTextField";
+import StyledSelect from "../formelements/StyledSelect";
+import MenuItem from "@mui/material/MenuItem";
 
 const apiURL = `${process.env.REACT_APP_API_BASE_URL}filament`;
 
@@ -35,7 +37,8 @@ const FilamentGrid = (props: PropsWithoutRef<{
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const bearerToken = useAPIToken();
-  const [filter, setfilter] = useState("");
+  const [filter, setFilter] = useState("");
+  const [typeFilter, setTypeFilter] = useState<FilamentType | "all">("all");
 
   const openDrawer = (id?: string) => {
     setSelectedRowId(id || "");
@@ -176,7 +179,12 @@ const FilamentGrid = (props: PropsWithoutRef<{
     />
     {(props.allowAdd || props.allowInactive) &&
         <Stack direction="row" spacing={0.5} justifyContent="flex-end">
-            <ShrunkTextField label="Search" sx={{paddingBottom: 1}} onChange={(e) => setfilter(e.target.value)}/>
+            <StyledSelect value={typeFilter} onChange={(e) => setTypeFilter(e.target.value as FilamentType & "all")}
+            >
+                <MenuItem value="all">All</MenuItem>
+              {[...filamentTypes].sort().map((type, index) => <MenuItem key={index} value={type}>{type}</MenuItem>)}
+            </StyledSelect>
+            <ShrunkTextField label="Search" sx={{paddingBottom: 1}} onChange={(e) => setFilter(e.target.value)}/>
             <FormControlLabel
                 control={
                   <Checkbox
@@ -212,7 +220,11 @@ const FilamentGrid = (props: PropsWithoutRef<{
               || i.name.toLowerCase().includes(filter.toLowerCase())
               || i.brand.toLowerCase().includes(filter.toLowerCase())
               || i.color.toLowerCase().includes(filter.toLowerCase())
-            );
+            )
+            && (
+              typeFilter === "all"
+              || i.type === typeFilter
+            )
         }
       )}
       columns={columns}
