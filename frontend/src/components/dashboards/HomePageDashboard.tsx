@@ -1,4 +1,4 @@
-import { Grid } from "@mui/material";
+import {Grid} from "@mui/material";
 import SummaryCard from "../SummaryCard";
 import filamentImage from "../../images/filamentspools.png";
 import printerImage from "../../images/3dprinter.png";
@@ -10,10 +10,10 @@ import useFetch from "../../hooks/use-fetch";
 const apiURL = `${process.env.REACT_APP_API_BASE_URL}dashboard`;
 
 const HomePageDashboard = () => {
-  const { data, isLoading } = useFetch<IDashboard>(apiURL);
+  const {data, isLoading} = useFetch<IDashboard>(apiURL);
   return (
     <>
-      <LoadingDialog open={isLoading} />
+      <LoadingDialog open={isLoading}/>
       <h2>Welcome to your dashboard!</h2>
       <Grid container spacing={3} justifyContent="center">
         <Grid item xs={12} md={4}>
@@ -34,9 +34,10 @@ const HomePageDashboard = () => {
         </Grid>
         <Grid item xs={12} md={4}>
           <SummaryCard
-            title="Active Prints"
-            total={data?.printCount || 0}
+            title="Recent Prints"
+            total={data?.recentPrintCount || 0}
             iconLocation={printImage}
+            link="/prints"
           ></SummaryCard>
         </Grid>
       </Grid>

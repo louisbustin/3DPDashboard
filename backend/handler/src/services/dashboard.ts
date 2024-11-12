@@ -1,15 +1,17 @@
-import { QueryCommand } from "@aws-sdk/client-dynamodb";
-import { getDynamoDBClient } from "../util/db";
+import {QueryCommand} from "@aws-sdk/client-dynamodb";
+import {getDynamoDBClient} from "../util/db";
 import getBaseResponse from "../util/base-reponse";
-import { RouterHandler } from "../util/router";
-import { HTTP_STATUS } from "../util/http-constants";
+import {RouterHandler} from "../util/router";
+import {HTTP_STATUS} from "../util/http-constants";
+import {getPrintsByUser} from "./prints";
+import dayjs from "dayjs";
 
 export const getDashboardInfo = async (usersub: string) => {
   //This method will return summary details for display on the main dashboard
   //Count of filaments
   //Count of printers
-  //Count of active prints (will return 0 for now, as prints are not implemented yet)
-  const returnObject = { filamentCount: 0, printerCount: 0, printCount: 0 };
+  //Count of recent prints
+  const returnObject = {filamentCount: 0, printerCount: 0, recentPrintCount: 0};
   const dynoClient = getDynamoDBClient();
 
   const command = new QueryCommand({
@@ -17,8 +19,8 @@ export const getDashboardInfo = async (usersub: string) => {
     IndexName: "usersub-index",
     KeyConditionExpression: "usersub = :usersub",
     ExpressionAttributeValues: {
-      ":usersub": { S: usersub },
-      ":stat": { N: "0" },
+      ":usersub": {S: usersub},
+      ":stat": {N: "0"},
     },
     FilterExpression:
       "filamentStatus = :stat OR attribute_not_exists(filamentStatus)",
@@ -32,14 +34,19 @@ export const getDashboardInfo = async (usersub: string) => {
     IndexName: "usersub-index",
     KeyConditionExpression: "usersub = :usersub",
     ExpressionAttributeValues: {
-      ":usersub": { S: usersub },
+      ":usersub": {S: usersub},
     },
     Select: "COUNT",
   });
 
   const printerResponse = await dynoClient.send(printerCommand);
-
   returnObject.printerCount = printerResponse.Count || 0;
+
+  const minDate = dayjs().subtract(1, "week").startOf("day").unix() * 1000;
+  const maxDate = dayjs().endOf("day").unix() * 1000;
+  const recentPrintsResult = await getPrintsByUser(usersub, minDate, maxDate);
+
+  returnObject.recentPrintCount = recentPrintsResult?.length || 0;
 
   return returnObject;
 };
