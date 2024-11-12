@@ -20,6 +20,9 @@ export enum FilamentStatus {
   Inactive,
 }
 
+export const filamentTypes = ["PLA", "ABS", "ASA", "PETG", "TPU"] as const;
+export type FilamentType = typeof filamentTypes[number];
+
 export const getDefaultFilament = (): IFilament => {
   return {
     id: "",
