@@ -1,6 +1,6 @@
-import { PropsWithChildren, useEffect, useState } from "react";
+import {PropsWithChildren, useEffect, useState} from "react";
 import EditDrawer from "./EditDrawer";
-import { MenuItem, Stack } from "@mui/material";
+import {MenuItem, Stack} from "@mui/material";
 import IFilament, {
   FilamentStatus,
   getDefaultFilament,
@@ -34,13 +34,13 @@ const EditFilamentDrawer = (
       if (props.filamentId) {
         const response = await fetch(apiURL + "/" + props.filamentId, {
           method: "GET",
-          headers: { Authorization: `Bearer ${bearerToken}` },
+          headers: {Authorization: `Bearer ${bearerToken}`},
         });
         if (response.ok) {
           //make sure fields are default, not a null
           const filament = await response.json();
           const defaultFilament = getDefaultFilament();
-          setFilament({ ...defaultFilament, ...filament });
+          setFilament({...defaultFilament, ...filament});
         }
       } else {
         setFilament(getDefaultFilament());
@@ -57,68 +57,68 @@ const EditFilamentDrawer = (
 
   const onChangeBrand = (brand: string) => {
     setFilament((f) => {
-      return { ...f, brand };
+      return {...f, brand};
     });
   };
   const onChangeName = (name: string) => {
     setFilament((f) => {
-      return { ...f, name };
+      return {...f, name};
     });
   };
   const onChangeType = (type: string) => {
     setFilament((f) => {
-      return { ...f, type };
+      return {...f, type};
     });
   };
 
   const onChangeTotalWeight = (totalWeight: string) => {
     setFilament((f) => {
-      return { ...f, totalWeight: Number(totalWeight) };
+      return {...f, totalWeight: Number(totalWeight)};
     });
   };
   const onChangeLowTemp = (lowTemp: string) => {
     setFilament((f) => {
-      return { ...f, lowTemp: Number(lowTemp) };
+      return {...f, lowTemp: Number(lowTemp)};
     });
   };
   const onChangeHighTemp = (highTemp: string) => {
     setFilament((f) => {
-      return { ...f, highTemp: Number(highTemp) };
+      return {...f, highTemp: Number(highTemp)};
     });
   };
   const onChangeLowBedTemp = (lowBedTemp: string) => {
     setFilament((f) => {
-      return { ...f, lowBedTemp: Number(lowBedTemp) };
+      return {...f, lowBedTemp: Number(lowBedTemp)};
     });
   };
   const onChangeHighBedTemp = (highBedTemp: string) => {
     setFilament((f) => {
-      return { ...f, highBedTemp: Number(highBedTemp) };
+      return {...f, highBedTemp: Number(highBedTemp)};
     });
   };
   const onChangeColor = (color: string) => {
     setFilament((f) => {
-      return { ...f, color };
+      return {...f, color};
     });
   };
   const onChangeColorCode = (colorCode: string) => {
     setFilament((f) => {
-      return { ...f, colorCode };
+      return {...f, colorCode};
     });
   };
   const onChangeStatus = (status: string | unknown) => {
     setFilament((f) => {
-      return { ...f, filamentStatus: Number(status) };
+      return {...f, filamentStatus: Number(status)};
     });
   };
   const onChangeReorderThreshold = (threshold: number) => {
     setFilament((f) => {
-      return { ...f, reorderThreshold: Number(threshold) };
+      return {...f, reorderThreshold: Number(threshold)};
     })
   }
   const onChangeNumOfSpools = (numOfSpools: number) => {
     setFilament((f) => {
-      return { ...f, numberOfSpools: Number(numOfSpools) };
+      return {...f, numberOfSpools: Number(numOfSpools)};
     })
   }
   const handleClose = (updateOccurred: boolean) => {
@@ -131,7 +131,7 @@ const EditFilamentDrawer = (
     const response = await fetch(apiURL, {
       method: "POST",
       body: JSON.stringify(filament),
-      headers: { Authorization: `Bearer ${bearerToken}` },
+      headers: {Authorization: `Bearer ${bearerToken}`},
     });
     if (response.ok) {
       setSuccessMessage(
@@ -149,7 +149,7 @@ const EditFilamentDrawer = (
 
   return (
     <>
-      <LoadingDialog open={isLoading} />
+      <LoadingDialog open={isLoading}/>
       <MessageBanner
         successMessage={successMessage}
         errorMessage={errorMessage}
@@ -185,7 +185,7 @@ const EditFilamentDrawer = (
               label="Color"
               value={filament.color}
               onChange={(e) => onChangeColor(e.target.value)}
-              sx={{ mr: 1 }}
+              sx={{mr: 1}}
             />
             <ColorPickerButton
               color={filament.colorCode}
@@ -204,13 +204,15 @@ const EditFilamentDrawer = (
             value={filament.reorderThreshold || 0}
             type="number"
             onChange={(e) => onChangeReorderThreshold(Number(e.target.value))}
+            InputProps={{inputProps: {min: 0}}}
           />
           <ShrunkTextField
             id="numOfSpools"
             label="Current Spools"
-            value={ filament.numberOfSpools || 0}
+            value={filament.numberOfSpools || 0}
             type="number"
             onChange={(e) => onChangeNumOfSpools(Number(e.target.value))}
+            InputProps={{inputProps: {min: 0}}}
           />
           <ShrunkTextField
             id="weight"
@@ -218,6 +220,7 @@ const EditFilamentDrawer = (
             value={filament.totalWeight}
             onChange={(e) => onChangeTotalWeight(e.target.value)}
             type="number"
+            InputProps={{inputProps: {min: 0}}}
           />
           <ShrunkTextField
             id="lowTemp"
@@ -225,6 +228,7 @@ const EditFilamentDrawer = (
             value={filament.lowTemp}
             onChange={(e) => onChangeLowTemp(e.target.value)}
             type="number"
+            InputProps={{inputProps: {min: 0}}}
           />
           <ShrunkTextField
             id="highTemp"
@@ -232,6 +236,7 @@ const EditFilamentDrawer = (
             value={filament.highTemp}
             onChange={(e) => onChangeHighTemp(e.target.value)}
             type="number"
+            InputProps={{inputProps: {min: 0}}}
           />
           <ShrunkTextField
             id="lowBedTemp"
@@ -239,6 +244,7 @@ const EditFilamentDrawer = (
             value={filament.lowBedTemp}
             onChange={(e) => onChangeLowBedTemp(e.target.value)}
             type="number"
+            InputProps={{inputProps: {min: 0}}}
           />
           <ShrunkTextField
             id="highBedTemp"
@@ -246,6 +252,7 @@ const EditFilamentDrawer = (
             value={filament.highBedTemp}
             onChange={(e) => onChangeHighBedTemp(e.target.value)}
             type="number"
+            InputProps={{inputProps: {min: 0}}}
           />
           <StyledSelect
             id="status"
