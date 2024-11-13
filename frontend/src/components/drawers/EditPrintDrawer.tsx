@@ -1,11 +1,11 @@
-import { PropsWithChildren, useEffect, useState } from "react";
+import {PropsWithChildren, useEffect, useState} from "react";
 import EditDrawer from "./EditDrawer";
-import { MenuItem, Stack } from "@mui/material";
+import {MenuItem, Stack} from "@mui/material";
 import useAPIToken from "../../hooks/use-api-token";
 import LoadingDialog from "../LoadingDialog";
 import MessageBanner from "../MessageBanner";
 import ShrunkTextField from "../formelements/ShrunkTextField";
-import IPrint, { Status, getDefaultPrint } from "../../models/IPrint";
+import IPrint, {Status, getDefaultPrint} from "../../models/IPrint";
 import StyledSelect from "../formelements/StyledSelect";
 import FilamentSelection from "../formelements/FilamentSelection";
 import PrinterSelection from "../formelements/PrinterSelection";
@@ -29,36 +29,36 @@ const EditPrintDrawer = (
 
   useEffect(() => {
     if (props.print) {
-      setPrint({ ...props.print });
+      setPrint({...props.print});
     }
   }, [props.print]);
 
   const onChangeAmount = (amount: string) => {
     setPrint((f) => {
-      return { ...f, amountUsed: Number(amount) };
+      return {...f, amountUsed: Number(amount)};
     });
   };
 
   const onChangeFilament = (filamentId: string) => {
     setPrint((f) => {
-      return { ...f, filamentId };
+      return {...f, filamentId};
     });
   };
 
   const onChangePrinter = (printerId: string) => {
     setPrint((f) => {
-      return { ...f, printerId };
+      return {...f, printerId};
     });
   };
 
   const onChangeStatus = (status: Status) => {
     setPrint((f) => {
-      return { ...f, PrintStatus: status };
+      return {...f, PrintStatus: status};
     });
   };
   const onChangeDuration = (durationSec: number) => {
     setPrint((f) => {
-      return { ...f, DurationSec: durationSec };
+      return {...f, DurationSec: durationSec};
     });
   };
   const handleClose = (updateOccurred: boolean) => {
@@ -79,7 +79,7 @@ const EditPrintDrawer = (
       {
         method: "POST",
         body: JSON.stringify(print),
-        headers: { Authorization: `Bearer ${bearerToken}` },
+        headers: {Authorization: `Bearer ${bearerToken}`},
       },
     );
     if (response.ok) {
@@ -96,7 +96,7 @@ const EditPrintDrawer = (
 
   return (
     <>
-      <LoadingDialog open={isLoading} />
+      <LoadingDialog open={isLoading}/>
       <MessageBanner
         successMessage={successMessage}
         errorMessage={errorMessage}
@@ -137,7 +137,7 @@ const EditPrintDrawer = (
             value={print.FileName}
             onChange={(e) =>
               setPrint((print) => {
-                return { ...print, FileName: e.target.value };
+                return {...print, FileName: e.target.value};
               })
             }
           />
@@ -147,6 +147,7 @@ const EditPrintDrawer = (
             value={print.DurationSec || 0}
             onChange={(e) => onChangeDuration(Number(e.target.value))}
             type="number"
+            InputProps={{inputProps: {min: 0}}}
           />
           <ShrunkTextField
             required
@@ -155,6 +156,7 @@ const EditPrintDrawer = (
             value={print.amountUsed}
             onChange={(e) => onChangeAmount(e.target.value)}
             type="number"
+            InputProps={{inputProps: {min: 0}}}
           />
           <FilamentSelection
             onChange={onChangeFilament}
