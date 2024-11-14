@@ -159,3 +159,18 @@ Resources:
           Properties:
             Path: /printers/{id}/prints
             Method: get
+        UserGet:
+          Type: Api
+          Properties:
+            Path: /user
+            Method: get
+        UserPost:
+          Type: Api
+          Properties:
+            Path: /user
+            Method: post
+        UserOptions:
+          Type: Api
+          Properties:
+            Path: /user
+            Method: options
