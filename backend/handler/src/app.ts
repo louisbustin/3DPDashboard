@@ -1,8 +1,8 @@
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
+import {APIGatewayProxyEvent, APIGatewayProxyResult} from "aws-lambda";
 import getBaseResponse from "./util/base-reponse";
-import { HTTP_METHOD, HTTP_STATUS } from "./util/http-constants";
+import {HTTP_METHOD, HTTP_STATUS} from "./util/http-constants";
 import dotenv from "dotenv";
-import { doRouting } from "./util/router";
+import {doRouting} from "./util/router";
 import {
   deletePrintsAPIResponse,
   getPrintAPIResponse,
@@ -16,20 +16,21 @@ import {
   getFilamentsAPIResponse,
   postFilamentsAPIResponse,
 } from "./services/filaments";
-import { getDashboardGETAPIResponse } from "./services/dashboard";
+import {getDashboardGETAPIResponse} from "./services/dashboard";
 import {
   deletePrinterByIdAPIResponse,
   getPrinterByIdAPIResponse,
   getPrintersAPIResponse,
   postPrintersAPIResponse,
 } from "./services/printers";
+import {getUsersApiResponse, postUsersApiResponse} from "./services/users";
 
 export const lambdaHandler = async (
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
   dotenv.config();
 
-  const result = await doRouting(event, [
+  return await doRouting(event, [
     {
       path: "/dashboard",
       method: HTTP_METHOD.OPTIONS,
@@ -189,7 +190,25 @@ export const lambdaHandler = async (
       handler: getPrintsByPrinterIdAPIResponse,
       authenticationRequired: true,
     },
+    {
+      path: "/user",
+      method: HTTP_METHOD.OPTIONS,
+      handler: () =>
+        getBaseResponse(HTTP_STATUS.OK, [HTTP_METHOD.GET, HTTP_METHOD.POST]),
+      authenticationRequired: false,
+    },
+    {
+      path: "/user",
+      method: HTTP_METHOD.GET,
+      handler: getUsersApiResponse,
+      authenticationRequired: true,
+    },
+    {
+      path: "/user",
+      method: HTTP_METHOD.POST,
+      handler: postUsersApiResponse,
+      authenticationRequired: true,
+    },
   ]);
 
-  return result;
 };

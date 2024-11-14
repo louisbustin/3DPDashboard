@@ -1,11 +1,11 @@
-import { getDynamoDBClient } from "../util/db";
+import {getDynamoDBClient} from "../util/db";
 import getBaseResponse from "../util/base-reponse";
-import { HTTP_STATUS } from "../util/http-constants";
-import { RouterHandler } from "../util/router";
-import { AttributeValue, QueryCommand } from "@aws-sdk/client-dynamodb";
-import { unmarshall } from "@aws-sdk/util-dynamodb";
-import { DeleteCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
-import { v4 } from "uuid";
+import {HTTP_STATUS} from "../util/http-constants";
+import {RouterHandler} from "../util/router";
+import {AttributeValue, QueryCommand} from "@aws-sdk/client-dynamodb";
+import {unmarshall} from "@aws-sdk/util-dynamodb";
+import {DeleteCommand, PutCommand} from "@aws-sdk/lib-dynamodb";
+import {v4} from "uuid";
 
 export const getPrintsByUser = async (
   usersub: string,
@@ -20,9 +20,9 @@ export const getPrintsByUser = async (
     KeyConditionExpression:
       "usersub = :usersub AND insertedAt BETWEEN :startDate AND :endDate",
     ExpressionAttributeValues: {
-      ":usersub": { S: usersub },
-      ":startDate": { N: startDate.toString() },
-      ":endDate": { N: endDate.toString() },
+      ":usersub": {S: usersub},
+      ":startDate": {N: startDate.toString()},
+      ":endDate": {N: endDate.toString()},
     },
   });
 
@@ -44,8 +44,8 @@ const getPrintsByPrinter = async (
     TableName: "3dpdashboard_prints",
     KeyConditionExpression: "printerId = :printerid",
     ExpressionAttributeValues: {
-      ":printerid": { S: printerId },
-      ":usersub": { S: usersub },
+      ":printerid": {S: printerId},
+      ":usersub": {S: usersub},
     },
     ExclusiveStartKey,
     ScanIndexForward: false,
@@ -76,7 +76,6 @@ const savePrint = async (
 
   // if the id in the path is undefined, this is a new print
   // in that case, setup some fields, like id and insertedAt
-  console.log("pathId", pathId);
   if (!pathId) {
     print.PrintId = v4();
     print.insertedAt = Date.now();
@@ -88,7 +87,7 @@ const savePrint = async (
   });
 
   const dynamo = getDynamoDBClient();
-  const result = await dynamo.send(command);
+  await dynamo.send(command);
 
   return "";
 };
@@ -101,8 +100,8 @@ const getPrint = async (printId: string, usersub: string) => {
     IndexName: "PrintId-index",
     KeyConditionExpression: "PrintId = :PrintId",
     ExpressionAttributeValues: {
-      ":usersub": { S: usersub },
-      ":PrintId": { S: printId },
+      ":usersub": {S: usersub},
+      ":PrintId": {S: printId},
     },
     FilterExpression: "usersub = :usersub",
   });
@@ -122,8 +121,8 @@ const deletePrint = async (printId: string, usersub: string) => {
     IndexName: "PrintId-index",
     KeyConditionExpression: "PrintId = :PrintId",
     ExpressionAttributeValues: {
-      ":usersub": { S: usersub },
-      ":PrintId": { S: printId },
+      ":usersub": {S: usersub},
+      ":PrintId": {S: printId},
     },
     FilterExpression: "usersub = :usersub",
   });
@@ -204,7 +203,7 @@ export const savePrintsAPIResponse: RouterHandler = async (context) => {
   }
 
   try {
-    const result = await savePrint(
+    await savePrint(
       print,
       context.usersub,
       context.event.pathParameters?.id
