@@ -33,7 +33,7 @@ export const getPrintsByUser = async (
   }
 };
 
-const getPrintsByPrinter = async (
+export const getPrintsByPrinter = async (
   printerId: string,
   usersub: string,
   ExclusiveStartKey?: Record<string, AttributeValue>
@@ -61,7 +61,7 @@ const getPrintsByPrinter = async (
   };
 };
 
-const savePrint = async (
+export const savePrint = async (
   printStr: string,
   usersub: string,
   pathId?: string
@@ -92,7 +92,7 @@ const savePrint = async (
   return "";
 };
 
-const getPrint = async (printId: string, usersub: string) => {
+export const getPrint = async (printId: string, usersub: string) => {
   const dynamo = getDynamoDBClient();
 
   const command = new QueryCommand({
@@ -113,7 +113,7 @@ const getPrint = async (printId: string, usersub: string) => {
   }
 };
 
-const deletePrint = async (printId: string, usersub: string) => {
+export const deletePrint = async (printId: string, usersub: string) => {
   const dynamo = getDynamoDBClient();
 
   const command = new QueryCommand({
