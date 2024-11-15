@@ -24,7 +24,7 @@ export const getUser = async (usersub: string) => {
   return {};
 }
 
-const saveUser = async (
+export const saveUser = async (
   userStr: string,
   usersub: string
 ) => {

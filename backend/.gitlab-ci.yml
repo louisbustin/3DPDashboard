@@ -23,6 +23,25 @@ build-backend: # This job runs in the build stage, which runs first.
     - sam build
     - echo "Compile complete."
 
+test-backend:
+  image: public.ecr.aws/sam/build-nodejs18.x:latest
+  stage: test
+  only:
+    changes:
+      - backend/**/*
+  artifacts:
+    untracked: true
+    paths:
+      - ./handler/coverage
+  before_script:
+    - cd backend
+  script:
+    - echo "Running tests..."
+    - cd handler
+    - npm install
+    - npm run test
+    - echo "Tests complete."
+
 deploy-backend:
   stage: deploy
   image: public.ecr.aws/sam/build-nodejs18.x:latest
