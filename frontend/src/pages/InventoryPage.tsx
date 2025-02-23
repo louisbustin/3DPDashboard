@@ -1,7 +1,7 @@
 import useFilament from "../hooks/use-filament";
 import {Stack} from "@mui/material";
 import FilamentGrid from "../components/grids/FilamentGrid";
-import LoadingDialog from "../components/LoadingDialog";
+import {LoadingDialog} from "@eforge/eforge-common";
 import FilamentInventoryGrid from "../components/FilamentInventoryGrid";
 
 const InventoryPage = () => {

@@ -2,7 +2,7 @@ import IPrint from "../models/IPrint";
 import { IPrintLastEvaluatedKey } from "../models/IPrintResponse";
 import useFetch from "./use-fetch";
 
-const apiURL = `${process.env.REACT_APP_API_BASE_URL}prints/`;
+const apiURL = `${import.meta.env.VITE_BASE_URL}prints/`;
 export type PrintOptions = {
   printerId?: string;
   startDate: number;

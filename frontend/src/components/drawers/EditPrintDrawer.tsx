@@ -1,16 +1,15 @@
-import {PropsWithChildren, useEffect, useState} from "react";
+import {PropsWithChildren, useContext, useEffect, useState} from "react";
 import EditDrawer from "./EditDrawer";
 import {MenuItem, Stack} from "@mui/material";
 import useAPIToken from "../../hooks/use-api-token";
-import LoadingDialog from "../LoadingDialog";
-import MessageBanner from "../MessageBanner";
+import {LoadingDialog, MessageBannerContext} from "@eforge/eforge-common";
 import ShrunkTextField from "../formelements/ShrunkTextField";
 import IPrint, {Status, getDefaultPrint} from "../../models/IPrint";
 import StyledSelect from "../formelements/StyledSelect";
 import FilamentSelection from "../formelements/FilamentSelection";
 import PrinterSelection from "../formelements/PrinterSelection";
 
-const printApiURL = `${process.env.REACT_APP_API_BASE_URL}prints`;
+const printApiURL = `${import.meta.env.VITE_BASE_URL}prints`;
 
 const EditPrintDrawer = (
   props: PropsWithChildren<{
@@ -22,9 +21,8 @@ const EditPrintDrawer = (
 ) => {
   const [isLoading, setIsLoading] = useState(false);
   const [print, setPrint] = useState<IPrint>(getDefaultPrint());
+  const msgContext = useContext(MessageBannerContext);
 
-  const [errorMessage, setErrorMessage] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
   const bearerToken = useAPIToken();
 
   useEffect(() => {
@@ -83,13 +81,10 @@ const EditPrintDrawer = (
       },
     );
     if (response.ok) {
-      setSuccessMessage(
-        `Print ${print.PrintId ? "updated" : "created"} successfully.`,
-      );
+      msgContext.setSuccessMessage(`Print ${print.PrintId ? "updated" : "created"} successfully.`)
       handleClose(true);
-      setTimeout(() => setSuccessMessage(""), 5000);
     } else {
-      setErrorMessage(`Update failed with message: ${response.statusText}`);
+      msgContext.setErrorMessage(`Update failed with message: ${response.statusText}`);
     }
     setIsLoading(false);
   };
@@ -97,14 +92,6 @@ const EditPrintDrawer = (
   return (
     <>
       <LoadingDialog open={isLoading}/>
-      <MessageBanner
-        successMessage={successMessage}
-        errorMessage={errorMessage}
-        onClose={() => {
-          setErrorMessage("");
-          setSuccessMessage("");
-        }}
-      />
       <EditDrawer
         open={props.open}
         onClose={() => handleClose(false)}

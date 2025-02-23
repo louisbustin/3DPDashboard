@@ -1,12 +1,12 @@
-import {Card, Chip, Grid, Stack} from "@mui/material";
+import {Card, Chip, Stack} from "@mui/material";
+import Grid from "@mui/material/Grid2";
 import {useParams} from "react-router-dom";
-import React, {useEffect, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import PieChartCard from "../PieChartCard";
 import {DefaultizedPieValueType, PieItemIdentifier} from "@mui/x-charts";
 import IPrint, {Status} from "../../models/IPrint";
-import MessageBanner from "../MessageBanner";
 import useAPIToken from "../../hooks/use-api-token";
-import LoadingDialog from "../LoadingDialog";
+import {LoadingDialog} from "@eforge/eforge-common";
 import {DatePicker} from "@mui/x-date-pickers";
 import dayjs, {Dayjs} from "dayjs";
 import BarChartCard from "../BarChartCard";
@@ -16,11 +16,12 @@ import PrintsGrid from "../grids/PrintsGrid";
 import BaseButton from "../buttons/BaseButton";
 import CollapseArea from "../CollapseArea";
 import useFilament from "../../hooks/use-filament";
+import {MessageBannerContext} from "@eforge/eforge-common";
 
 const MAX_DATE = 9999999999999;
 const MIN_DATE = 0;
 
-const apiURL = `${process.env.REACT_APP_API_BASE_URL}printers/`;
+const apiURL = `${import.meta.env.VITE_BASE_URL}printers/`;
 
 type IFilamentBrandSummary = {
   brand: string;
@@ -43,13 +44,12 @@ type IPrinterDashboardData = {
 
 const PrinterDashboard = () => {
   const EXPAND_GRAPHS_KEY = "expand-graphs";
+  const msgCtx = useContext(MessageBannerContext);
   const {printerid} = useParams();
   const {printers, isLoading} = usePrinters();
   const data = printers?.filter((p) => p.id === printerid)[0];
   const [dashboardData, setDashboardData] = useState<IPrinterDashboardData>();
   const [printFilter, setPrintFilter] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
   const bearerToken = useAPIToken();
   const [showLoadingDialog, setShowLoadingDialog] = useState(false);
   const [minDateFilter, setMinDateFilter] = useState<number>(MIN_DATE);
@@ -164,7 +164,7 @@ const PrinterDashboard = () => {
     item: DefaultizedPieValueType,
   ) => {
     if (printFilter !== item.label) {
-      setPrintFilter(item.label || "");
+      setPrintFilter((item.label as string) || "");
     } else {
       setPrintFilter("");
     }
@@ -177,8 +177,7 @@ const PrinterDashboard = () => {
       );
       return [...newArray];
     });
-    setSuccessMessage("Delete of print successful.");
-    setTimeout(() => setSuccessMessage(""), 5000);
+    msgCtx.setSuccessMessage("Delete of print successful.");
   };
 
   const onEditPrint = (print: IPrint) => {
@@ -199,18 +198,10 @@ const PrinterDashboard = () => {
     <>
       <h2>Dashboard for {data?.name}</h2>
       <LoadingDialog open={showLoadingDialog || isLoading}></LoadingDialog>
-      <MessageBanner
-        successMessage={successMessage}
-        errorMessage={errorMessage}
-        onClose={() => {
-          setSuccessMessage("");
-          setErrorMessage("");
-        }}
-      ></MessageBanner>
       <Grid container spacing={3} justifyContent="center" alignContent="center">
         {dashboardData && (
           <>
-            <Grid item xs={12}>
+            <Grid size={{xs: 12}}>
               <CollapseArea
                 initiallyExpanded={true}
                 summary="Graphs"
@@ -222,11 +213,9 @@ const PrinterDashboard = () => {
                   justifyContent="center"
                   alignContent="center"
                 >
-                  <Grid item xs={12} md={4}>
+                  <Grid size={{xs: 12, md: 4}}>
                     <PieChartCard
                       pieChartProps={{
-                        height: 250,
-                        onClick: onPieChartClick,
                         series: [
                           {
                             data: [
@@ -250,8 +239,8 @@ const PrinterDashboard = () => {
                               },
                             ],
                             highlightScope: {
-                              faded: "global",
-                              highlighted: "item",
+                              fade: "global",
+                              highlight: "item",
                             },
                             faded: {
                               innerRadius: 30,
@@ -262,12 +251,11 @@ const PrinterDashboard = () => {
                         ],
                         slotProps: {
                           legend: {
-                            direction: "column",
+                            direction: "vertical",
                             position: {
                               vertical: "middle",
-                              horizontal: "right",
+                              horizontal: "end",
                             },
-                            padding: 0,
                           },
                         },
                       }}
@@ -275,48 +263,35 @@ const PrinterDashboard = () => {
                       height="90%"
                     />
                   </Grid>
-                  <Grid item xs={12} md={4}>
+                  <Grid size={{xs: 12, md: 4}}>
                     {dashboardData && dashboardData.printsByFilament &&
-                        <BarChartCard
-                            barCharProps={{
-                              height: 250,
-                              yAxis: [
-                                {
-                                  data: [],
+                      <BarChartCard
+                        barCharProps={{
+                          series: [
+                            {
+                              data: dashboardData.printsByFilament.length > 0 ? dashboardData.printsByFilament.map((f) => f.statusCount.Complete) : [0, 0, 0],
+                              label: "Complete",
+                              color: "green"
+                            },
+                            {
+                              data: dashboardData.printsByFilament.length > 0 ? dashboardData.printsByFilament.map((f) => f.statusCount.Failed) : [0, 0, 0],
+                              label: "Failed",
+                              color: "red"
+                            },
+                            {
+                              data: dashboardData.printsByFilament.length > 0 ? dashboardData.printsByFilament.map((f) => f.statusCount.Pending) : [0, 0, 0],
+                              label: "Pending",
+                              color: "yellow"
+                            },
+                          ],
 
-                                },
-                              ],
-                              xAxis: [
-                                {
-                                  scaleType: "band",
-                                  data: dashboardData.printsByFilament.length > 0 ? dashboardData.printsByFilament.map((f) => f.brand) : [],
-                                },
-                              ],
-                              series: [
-                                {
-                                  data: dashboardData.printsByFilament.length > 0 ? dashboardData.printsByFilament.map((f) => f.statusCount.Complete) : [0, 0, 0],
-                                  label: "Complete",
-                                  color: "green"
-                                },
-                                {
-                                  data: dashboardData.printsByFilament.length > 0 ? dashboardData.printsByFilament.map((f) => f.statusCount.Failed) : [0, 0, 0],
-                                  label: "Failed",
-                                  color: "red"
-                                },
-                                {
-                                  data: dashboardData.printsByFilament.length > 0 ? dashboardData.printsByFilament.map((f) => f.statusCount.Pending) : [0, 0, 0],
-                                  label: "Pending",
-                                  color: "yellow"
-                                },
-                              ],
-
-                            }}
-                            title="Prints by Filament"
-                            height="90%"
-                        ></BarChartCard>
+                        }}
+                        title="Prints by Filament"
+                        height="90%"
+                      ></BarChartCard>
                     }
                   </Grid>
-                  <Grid item xs={12} md={4}>
+                  <Grid size={{xs: 12, md: 4}}>
                     <Card sx={{p: 3}}>Prints by Filename coming</Card>
                   </Grid>
                 </Grid>
@@ -326,7 +301,7 @@ const PrinterDashboard = () => {
         )}
         {data && (
           <>
-            <Grid item xs={6}>
+            <Grid size={{xs: 6}}>
               <Stack direction="row" display="flex" alignItems="center">
                 From
                 <DatePicker
@@ -355,7 +330,7 @@ const PrinterDashboard = () => {
                 />
               </Stack>
             </Grid>
-            <Grid item xs={6} alignItems="center" justifyItems="center">
+            <Grid size={{xs: 6}} alignItems="center" justifyItems="center">
               {lastEvaluatedKey && (
                 <BaseButton onClick={() => setPullNextPrints(true)}>
                   Get Next 50 prints

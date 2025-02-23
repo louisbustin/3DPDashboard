@@ -12,7 +12,7 @@ const useAPIToken = () => {
     };
 
     if (jwt === "" && auth0 && auth0.isAuthenticated) {
-      getToken();
+      getToken().then();
     }
   }, [auth0, jwt]);
 

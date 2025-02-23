@@ -2,18 +2,19 @@ import {DataGrid, GridActionsCellItem, GridColDef} from "@mui/x-data-grid";
 import IPrint, {getDefaultPrint} from "../../models/IPrint";
 import ImageHoverZoom from "../ImageHoverZoom";
 import moment from "moment";
-import {Fab, Tooltip, Grid} from "@mui/material";
+import {Fab, Tooltip} from "@mui/material";
+import Grid from "@mui/material/Grid2";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditPrintDrawer from "../drawers/EditPrintDrawer";
-import {useState} from "react";
+import React, {useState} from "react";
 import ConfirmationDialog from "../ConfirmationDialog";
-import LoadingDialog from "../LoadingDialog";
+import {LoadingDialog} from "@eforge/eforge-common";
 import useAPIToken from "../../hooks/use-api-token";
 import usePrinters from "../../hooks/use-printers";
 import AddIcon from "@mui/icons-material/Add";
 
-const apiURL = `${process.env.REACT_APP_API_BASE_URL}prints/`;
+const apiURL = `${import.meta.env.VITE_BASE_URL}prints/`;
 
 const PrintsGrid = (
   props: React.PropsWithoutRef<{
@@ -82,7 +83,7 @@ const PrintsGrid = (
     {
       field: "insertedAt",
       headerName: "Added At",
-      valueFormatter: (field) =>
+      valueFormatter: (field: any) =>
         moment(Number(field.value)).format("YYYY-MM-DD"),
     },
     {
@@ -176,7 +177,6 @@ const PrintsGrid = (
               }}
               pageSizeOptions={[10, 50, 100]}
               sx={{marginTop: 2, marginLeft: 3}}
-              autoHeight
               getRowId={(row) => row.insertedAt}
             />
             {selectedPrint && props.allowEdit && (
@@ -203,7 +203,7 @@ const PrintsGrid = (
                 setPrintToDelete(null);
               }}
               onConfirm={() => {
-                deletePrint(printToDelete!);
+                deletePrint(printToDelete!).then();
               }}
             >
               Are you sure you want to delete this print? This action cannot be

@@ -1,4 +1,4 @@
-import {PropsWithoutRef, useState} from "react";
+import {PropsWithoutRef, useContext, useState} from "react";
 import IFilament, {FilamentStatus, FilamentType, filamentTypes} from "../../models/IFilament";
 import {DataGrid, GridActionsCellItem, GridColDef} from "@mui/x-data-grid";
 import {Button, Checkbox, FormControlLabel, Stack, Tooltip} from "@mui/material";
@@ -11,13 +11,12 @@ import useAPIToken from "../../hooks/use-api-token";
 import EditFilamentDrawer from "../drawers/EditFilamentDrawer";
 import _ from "lodash";
 import ConfirmationDialog from "../ConfirmationDialog";
-import LoadingDialog from "../LoadingDialog";
-import MessageBanner from "../MessageBanner";
+import {LoadingDialog, MessageBannerContext} from "@eforge/eforge-common";
 import ShrunkTextField from "../formelements/ShrunkTextField";
 import StyledSelect from "../formelements/StyledSelect";
 import MenuItem from "@mui/material/MenuItem";
 
-const apiURL = `${process.env.REACT_APP_API_BASE_URL}filament`;
+const apiURL = `${import.meta.env.VITE_BASE_URL}filament`;
 
 const FilamentGrid = (props: PropsWithoutRef<{
   data: IFilament[],
@@ -34,11 +33,10 @@ const FilamentGrid = (props: PropsWithoutRef<{
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [showInactive, setShowInactive] = useState(false);
   const [showLoadingDialog, setShowLoadingDialog] = useState(false);
-  const [successMessage, setSuccessMessage] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
   const bearerToken = useAPIToken();
   const [filter, setFilter] = useState("");
   const [typeFilter, setTypeFilter] = useState<FilamentType | "all">("all");
+  const msgCtx = useContext(MessageBannerContext);
 
   const openDrawer = (id?: string) => {
     setSelectedRowId(id || "");
@@ -56,10 +54,9 @@ const FilamentGrid = (props: PropsWithoutRef<{
       if (props.onDeleteSuccess) {
         props.onDeleteSuccess();
       }
-      setSuccessMessage("Filament successfully deleted.");
-      setTimeout(() => setSuccessMessage(""), 5000);
+      msgCtx.setSuccessMessage("Filament successfully deleted.");
     } else {
-      setErrorMessage("Error occurred deleting filament.");
+      msgCtx.setErrorMessage("Error occurred deleting filament.");
     }
     setShowLoadingDialog(false);
   };
@@ -78,10 +75,9 @@ const FilamentGrid = (props: PropsWithoutRef<{
       if (props.onEditSuccess) {
         props.onEditSuccess();
       }
-      setSuccessMessage("Filament successfully updated.");
-      setTimeout(() => setSuccessMessage(""), 5000);
+      msgCtx.setSuccessMessage("Filament successfully updated.");
     } else {
-      setErrorMessage("Error occurred updating filament.");
+      msgCtx.setErrorMessage("Error occurred updating filament.");
     }
     setShowLoadingDialog(false);
   }
@@ -104,7 +100,7 @@ const FilamentGrid = (props: PropsWithoutRef<{
       field: "numberOfSpools",
       headerName: "#Spools",
       flex: 1,
-      valueFormatter: (params) => params.value || 0,
+      valueFormatter: (params: any) => params.value || 0,
       align: "center",
       headerAlign: "center"
     },
@@ -161,7 +157,6 @@ const FilamentGrid = (props: PropsWithoutRef<{
     },
   ];
   return <>
-    <MessageBanner successMessage={successMessage} errorMessage={errorMessage}/>
     <LoadingDialog open={showLoadingDialog}/>
     <EditFilamentDrawer
       open={drawerOpen}
@@ -178,25 +173,25 @@ const FilamentGrid = (props: PropsWithoutRef<{
       filamentId={_.clone(selectedRowId)}
     />
     {(props.allowAdd || props.allowInactive) &&
-        <Stack direction="row" spacing={0.5} justifyContent="flex-end">
-            <StyledSelect value={typeFilter} onChange={(e) => setTypeFilter(e.target.value as FilamentType & "all")}
-            >
-                <MenuItem value="all">All</MenuItem>
-              {[...filamentTypes].sort().map((type, index) => <MenuItem key={index} value={type}>{type}</MenuItem>)}
-            </StyledSelect>
-            <ShrunkTextField label="Search" sx={{paddingBottom: 1}} onChange={(e) => setFilter(e.target.value)}/>
-            <FormControlLabel
-                control={
-                  <Checkbox
-                    onChange={(e) => setShowInactive(e.target.checked)}
-                  ></Checkbox>
-                }
-                label="Show Inactive"
-            ></FormControlLabel>
-            <Button onClick={() => openDrawer()} aria-label="Add">
-                <AddIcon/>
-            </Button>
-        </Stack>}
+      <Stack direction="row" spacing={0.5} justifyContent="flex-end">
+        <StyledSelect value={typeFilter} onChange={(e) => setTypeFilter(e.target.value as FilamentType & "all")}
+        >
+          <MenuItem value="all">All</MenuItem>
+          {[...filamentTypes].sort().map((type, index) => <MenuItem key={index} value={type}>{type}</MenuItem>)}
+        </StyledSelect>
+        <ShrunkTextField label="Search" sx={{paddingBottom: 1}} onChange={(e) => setFilter(e.target.value)}/>
+        <FormControlLabel
+          control={
+            <Checkbox
+              onChange={(e) => setShowInactive(e.target.checked)}
+            ></Checkbox>
+          }
+          label="Show Inactive"
+        ></FormControlLabel>
+        <Button onClick={() => openDrawer()} aria-label="Add">
+          <AddIcon/>
+        </Button>
+      </Stack>}
     <ConfirmationDialog
       open={deleteDialogOpen}
       onCancel={() => setDeleteDialogOpen(false)}
