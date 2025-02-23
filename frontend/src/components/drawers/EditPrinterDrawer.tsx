@@ -1,13 +1,12 @@
-import { PropsWithChildren, useEffect, useState } from "react";
+import {PropsWithChildren, useContext, useEffect, useState} from "react";
 import EditDrawer from "./EditDrawer";
-import { Stack } from "@mui/material";
-import IPrinter, { getDefaultPrinter } from "../../models/IPrinter";
+import {Stack} from "@mui/material";
+import IPrinter, {getDefaultPrinter} from "../../models/IPrinter";
 import useAPIToken from "../../hooks/use-api-token";
-import LoadingDialog from "../LoadingDialog";
-import MessageBanner from "../MessageBanner";
+import {LoadingDialog, MessageBannerContext} from "@eforge/eforge-common";
 import ShrunkTextField from "../formelements/ShrunkTextField";
 
-const apiURL = `${process.env.REACT_APP_API_BASE_URL}printers`;
+const apiURL = `${import.meta.env.VITE_BASE_URL}printers`;
 
 const EditPrinterDrawer = (
   props: PropsWithChildren<{
@@ -18,9 +17,7 @@ const EditPrinterDrawer = (
 ) => {
   const [isLoading, setIsLoading] = useState(false);
   const [printer, setPrinter] = useState<IPrinter>(getDefaultPrinter());
-
-  const [errorMessage, setErrorMessage] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
+  const msgCtx = useContext(MessageBannerContext);
   const bearerToken = useAPIToken();
 
   useEffect(() => {
@@ -29,7 +26,7 @@ const EditPrinterDrawer = (
       if (props.printerId) {
         const response = await fetch(apiURL + "/" + props.printerId, {
           method: "GET",
-          headers: { Authorization: `Bearer ${bearerToken}` },
+          headers: {Authorization: `Bearer ${bearerToken}`},
         });
         if (response.ok) {
           setPrinter(await response.json());
@@ -41,28 +38,28 @@ const EditPrinterDrawer = (
       // Click on the text field when done loading
       document.getElementById("brand")?.focus();
     };
-    getPrinter();
+    getPrinter().then();
   }, [props.printerId, bearerToken]);
 
   const onChangeBrand = (brand: string) => {
     setPrinter((f) => {
-      return { ...f, brand };
+      return {...f, brand};
     });
   };
   const onChangeName = (name: string) => {
     setPrinter((f) => {
-      return { ...f, name };
+      return {...f, name};
     });
   };
   const onChangeType = (type: string) => {
     setPrinter((f) => {
-      return { ...f, type };
+      return {...f, type};
     });
   };
 
   const onChangeOctoId = (octoId: string) => {
     setPrinter((f) => {
-      return { ...f, octoEverywhereId: octoId };
+      return {...f, octoEverywhereId: octoId};
     });
   };
   const handleClose = (updateOccurred: boolean) => {
@@ -75,29 +72,20 @@ const EditPrinterDrawer = (
     const response = await fetch(apiURL, {
       method: "POST",
       body: JSON.stringify(printer),
-      headers: { Authorization: `Bearer ${bearerToken}` },
+      headers: {Authorization: `Bearer ${bearerToken}`},
     });
     if (response.ok) {
-      setSuccessMessage("Printer created successfully.");
+      msgCtx.setSuccessMessage("Printer created successfully.");
       handleClose(true);
-      setTimeout(() => setSuccessMessage(""), 5000);
     } else {
-      setErrorMessage(`Creation failed with message: ${response.statusText}`);
+      msgCtx.setErrorMessage(`Creation failed with message: ${response.statusText}`);
     }
     setIsLoading(false);
   };
 
   return (
     <>
-      <LoadingDialog open={isLoading} />
-      <MessageBanner
-        successMessage={successMessage}
-        errorMessage={errorMessage}
-        onClose={() => {
-          setErrorMessage("");
-          setSuccessMessage("");
-        }}
-      />
+      <LoadingDialog open={isLoading}/>
       <EditDrawer
         open={props.open}
         onClose={() => handleClose(false)}

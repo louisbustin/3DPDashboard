@@ -1,4 +1,5 @@
 import jsonwebtoken from "jsonwebtoken";
+
 let key = "";
 
 const getPublicKey = async () => {
@@ -20,14 +21,13 @@ const getUserInfo = async (authToken?: string) => {
   }
   if (authToken) {
     try {
-      const verify = jsonwebtoken.verify(
+      return jsonwebtoken.verify(
         authToken.replace("Bearer ", ""),
         key,
         {
           algorithms: ["RS256"],
         }
       );
-      return verify;
     } catch (e) {
       console.error(e);
     }

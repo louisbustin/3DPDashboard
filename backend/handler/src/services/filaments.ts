@@ -1,11 +1,11 @@
-import { QueryCommand } from "@aws-sdk/client-dynamodb";
-import { getDynamoDBClient } from "../util/db";
-import { unmarshall } from "@aws-sdk/util-dynamodb";
+import {QueryCommand} from "@aws-sdk/client-dynamodb";
+import {getDynamoDBClient} from "../util/db";
+import {unmarshall} from "@aws-sdk/util-dynamodb";
 import getBaseResponse from "../util/base-reponse";
-import { RouterHandler } from "../util/router";
-import { HTTP_STATUS } from "../util/http-constants";
-import { DeleteCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
-import { v4 as uuidv4 } from "uuid";
+import {RouterHandler} from "../util/router";
+import {HTTP_STATUS} from "../util/http-constants";
+import {DeleteCommand, PutCommand} from "@aws-sdk/lib-dynamodb";
+import {v4 as uuidv4} from "uuid";
 
 export const getFilamentById = async (id: string, usersub: string) => {
   const dynamo = getDynamoDBClient();
@@ -114,8 +114,7 @@ export const postFilamentsAPIResponse: RouterHandler = async (context) => {
     }
 
     await saveFilament(context.event.body, context.usersub);
-    const response = await getBaseResponse(HTTP_STATUS.OK);
-    return response;
+    return await getBaseResponse(HTTP_STATUS.OK);
   } catch (err) {
     console.error(err);
     return await getBaseResponse(HTTP_STATUS.INTERNAL_SERVER_ERROR);

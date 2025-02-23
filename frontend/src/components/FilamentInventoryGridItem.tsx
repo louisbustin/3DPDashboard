@@ -1,4 +1,4 @@
-import React, {PropsWithoutRef, useRef, useState} from "react";
+import React, {PropsWithoutRef, useContext, useRef, useState} from "react";
 import IFilament from "../models/IFilament";
 import {Button, Card, CardActions, CardContent, Popper, Stack, styled, useTheme} from "@mui/material";
 import Typography from "@mui/material/Typography";
@@ -9,23 +9,21 @@ import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import {green, red} from "@mui/material/colors";
 import useAPIToken from "../hooks/use-api-token";
-import LoadingDialog from "./LoadingDialog";
-import MessageBanner from "./MessageBanner";
+import {LoadingDialog, MessageBannerContext} from "@eforge/eforge-common";
 
-const apiURL = `${process.env.REACT_APP_API_BASE_URL}filament`;
+const apiURL = `${import.meta.env.VITE_BASE_URL}filament`;
 
 const FilamentInventoryGridItem = (props: PropsWithoutRef<{
   filament: IFilament,
   onEditSuccess?: (filament: IFilament) => void
 }>) => {
+  const msgCtx = useContext(MessageBannerContext);
   const theme = useTheme();
   const [spoolCount, setSpoolCount] = useState(props.filament.numberOfSpools || 0);
   const textFieldRef = useRef<HTMLInputElement>(null);
   const [showOkCancel, setShowOkCancel] = useState(false);
   const [showLoadingDialog, setShowLoadingDialog] = useState(false);
   const bearerToken = useAPIToken();
-  const [successMessage, setSuccessMessage] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
 
   const StyledTypography = styled(Typography)({
     paddingInline: 1,
@@ -53,20 +51,19 @@ const FilamentInventoryGridItem = (props: PropsWithoutRef<{
     const response = await updateFilament(filament);
     setShowLoadingDialog(false);
     if (response.ok) {
-      setSuccessMessage("Filament updated successfully");
+      msgCtx.setSuccessMessage("Filament updated successfully");
       if (props.onEditSuccess) {
         props.onEditSuccess({
           ...props.filament,
           numberOfSpools: spoolCount
         });
       } else {
-        setErrorMessage("Filament update failed");
+        msgCtx.setErrorMessage("Filament update failed");
       }
     }
   }
   return <>
     <LoadingDialog open={showLoadingDialog}/>
-    <MessageBanner successMessage={successMessage} errorMessage={errorMessage}/>
     <Card sx={{
       marginInline: 1,
       minWidth: 200,
@@ -84,18 +81,18 @@ const FilamentInventoryGridItem = (props: PropsWithoutRef<{
           {props.filament.name && <StyledTypography>{props.filament.name}</StyledTypography>}
           {props.filament.type && <StyledTypography>{props.filament.type}</StyledTypography>}
           {props.filament.color && <StyledTypography
-              sx={{
-                backgroundColor: props.filament.colorCode,
-                color: props.filament.colorCode ? theme.palette.getContrastText(props.filament.colorCode) : "",
-                borderRadius: 3,
-                padding: 2,
-                width: 100,
-                maxWidth: 100,
-                maxHeight: 100,
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                marginTop: 1,
-              }}>{props.filament.color}</StyledTypography>}
+            sx={{
+              backgroundColor: props.filament.colorCode,
+              color: props.filament.colorCode ? theme.palette.getContrastText(props.filament.colorCode) : "",
+              borderRadius: 3,
+              padding: 2,
+              width: 100,
+              maxWidth: 100,
+              maxHeight: 100,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              marginTop: 1,
+            }}>{props.filament.color}</StyledTypography>}
         </Stack>
       </CardContent>
       <CardActions sx={{alignItems: "center", justifyContent: "center", justifyItems: "center"}}>

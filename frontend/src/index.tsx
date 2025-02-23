@@ -1,22 +1,21 @@
 import React, {Suspense} from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
-import App from "./App";
 import {Auth0Provider} from "@auth0/auth0-react";
-import reportWebVitals from "./reportWebVitals";
 import {createBrowserRouter, RouterProvider} from "react-router-dom";
-import HomePage from "./pages/HomePage";
 import {AuthenticationGuard} from "./components/AuthenticationGuard";
 
 import "@fontsource/roboto/300.css";
 import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
-import ResinPage from "./pages/ResinPage";
-import PrintsPage from "./pages/PrintsPage";
-import LoadingDialog from "./components/LoadingDialog";
-import DocumentationPage from "./pages/DocumentationPage";
+import {LoadingDialog, MessageBannerContextProvider} from "@eforge/eforge-common";
 
+const App = React.lazy(() => import("./App"));
+const ResinPage = React.lazy(() => import("./pages/ResinPage"));
+const PrintsPage = React.lazy(() => import("./pages/PrintsPage"));
+const DocumentationPage = React.lazy(() => import("./pages/DocumentationPage"));
+const HomePage = React.lazy(() => import("./pages/HomePage"));
 const PrivacyPage = React.lazy(() => import("./pages/PrivacyPage"));
 const ProfilePage = React.lazy(() => import("./pages/ProfilePage"));
 const ErrorPage = React.lazy(() => import("./ErrorPage"));
@@ -117,21 +116,19 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <Auth0Provider
-      domain={process.env.REACT_APP_AUTH0_DOMAIN || ""}
-      clientId={process.env.REACT_APP_AUTH0_CLIENTID || ""}
+      domain={import.meta.env.VITE_AUTH0_DOMAIN || ""}
+      clientId={import.meta.env.VITE_AUTH0_CLIENTID || ""}
       authorizationParams={{
         redirect_uri: window.location.href,
-        audience: `${process.env.REACT_APP_AUTH0_AUDIENCE || ""}`,
+        audience: `${import.meta.env.VITE_AUTH0_AUDIENCE || ""}`,
       }}
     >
-      <Suspense fallback={<LoadingDialog open={true}/>}>
-        <RouterProvider router={router}/>
-      </Suspense>
+      <MessageBannerContextProvider>
+        <Suspense fallback={<LoadingDialog open={true}/>}>
+          <RouterProvider router={router}/>
+        </Suspense>
+      </MessageBannerContextProvider>
     </Auth0Provider>
   </React.StrictMode>
 );
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();

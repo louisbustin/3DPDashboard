@@ -1,6 +1,6 @@
 import { withAuthenticationRequired } from "@auth0/auth0-react";
 import React, { ComponentType, PropsWithoutRef } from "react";
-import LoadingDialog from "./LoadingDialog";
+import {LoadingDialog} from "@eforge/eforge-common";
 
 export const AuthenticationGuard = (
   props: PropsWithoutRef<{ component: ComponentType<object> }>

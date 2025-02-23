@@ -1,6 +1,7 @@
 import {PropsWithoutRef, useState} from "react";
 import IFilament from "../models/IFilament";
-import {Grid, Stack} from "@mui/material";
+import {Stack} from "@mui/material";
+import Grid from "@mui/material/Grid2";
 import FilamentInventoryGridItem from "./FilamentInventoryGridItem";
 import ShrunkTextField from "./formelements/ShrunkTextField";
 

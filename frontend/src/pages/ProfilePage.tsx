@@ -1,22 +1,20 @@
-import React, {useState} from "react";
-import LoadingDialog from "../components/LoadingDialog";
+import React, {useContext, useState} from "react";
+import {LoadingDialog, MessageBannerContext} from "@eforge/eforge-common";
 import useUser, {UserProfile} from "../hooks/use-user";
 import {Card, CardActions, CardContent, Stack} from "@mui/material";
 import Avatar from "@mui/material/Avatar";
 import Typography from "@mui/material/Typography";
 import Switch from "@mui/material/Switch";
 import SaveButton from "../components/buttons/SaveButton";
-import MessageBanner from "../components/MessageBanner";
 import useApiToken from "../hooks/use-api-token";
 
-const apiUrl = `${process.env.REACT_APP_API_BASE_URL}user`;
+const apiUrl = `${import.meta.env.VITE_BASE_URL}user`;
 
 const ProfilePage = () => {
   const {userProfile, isAuthenticated, isLoading} = useUser();
   const [userProf, setUserProf] = useState<UserProfile>();
-  const [successMessage, setSuccessMessage] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
   const token = useApiToken();
+  const msgCtx = useContext(MessageBannerContext)
 
   const saveProfile = async () => {
     if (userProf) {
@@ -28,10 +26,9 @@ const ProfilePage = () => {
         },
       });
       if (response.ok) {
-        setSuccessMessage("Profile saved successfully");
-        setTimeout(() => setSuccessMessage(""), 5000);
+        msgCtx.setSuccessMessage("Profile saved successfully");
       } else {
-        setErrorMessage("Failed to save profile");
+        msgCtx.setErrorMessage("Failed to save profile");
       }
     }
   }
@@ -46,14 +43,6 @@ const ProfilePage = () => {
     <div>
       {isAuthenticated && userProf && (
         <>
-          <MessageBanner
-            successMessage={successMessage}
-            errorMessage={errorMessage}
-            onClose={() => {
-              setSuccessMessage("");
-              setErrorMessage("");
-            }}
-          />
           <Stack spacing={2} direction="row" marginTop={2}>
             <Card sx={{
               minWidth: 200,

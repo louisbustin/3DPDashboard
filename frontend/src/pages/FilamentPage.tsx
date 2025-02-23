@@ -1,4 +1,4 @@
-import LoadingDialog from "../components/LoadingDialog";
+import {LoadingDialog} from "@eforge/eforge-common";
 import useFilament from "../hooks/use-filament";
 import FilamentGrid from "../components/grids/FilamentGrid";
 

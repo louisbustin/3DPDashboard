@@ -1,4 +1,4 @@
-import {PropsWithChildren, useEffect, useState} from "react";
+import {PropsWithChildren, useContext, useEffect, useState} from "react";
 import EditDrawer from "./EditDrawer";
 import {MenuItem, Stack} from "@mui/material";
 import IFilament, {
@@ -6,14 +6,13 @@ import IFilament, {
   getDefaultFilament,
 } from "../../models/IFilament";
 import useAPIToken from "../../hooks/use-api-token";
-import LoadingDialog from "../LoadingDialog";
-import MessageBanner from "../MessageBanner";
+import {LoadingDialog} from "@eforge/eforge-common";
 import ShrunkTextField from "../formelements/ShrunkTextField";
 import StyledSelect from "../formelements/StyledSelect";
-
+import {MessageBannerContext} from "@eforge/eforge-common";
 import ColorPickerButton from "../buttons/ColorPickerButton";
 
-const apiURL = `${process.env.REACT_APP_API_BASE_URL}filament`;
+const apiURL = `${import.meta.env.VITE_BASE_URL}filament`;
 
 const EditFilamentDrawer = (
   props: PropsWithChildren<{
@@ -22,11 +21,10 @@ const EditFilamentDrawer = (
     filamentId?: string;
   }>
 ) => {
+  const msgCtx = useContext(MessageBannerContext);
   const [isLoading, setIsLoading] = useState(false);
   const [filament, setFilament] = useState<IFilament>(getDefaultFilament());
 
-  const [errorMessage, setErrorMessage] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
   const bearerToken = useAPIToken();
   useEffect(() => {
     const getFilament = async () => {
@@ -51,7 +49,7 @@ const EditFilamentDrawer = (
       document.getElementById("brand")?.focus();
     };
     if (props.open) {
-      getFilament();
+      getFilament().then();
     }
   }, [props.filamentId, bearerToken, props.open]);
 
@@ -134,15 +132,14 @@ const EditFilamentDrawer = (
       headers: {Authorization: `Bearer ${bearerToken}`},
     });
     if (response.ok) {
-      setSuccessMessage(
+      msgCtx.setSuccessMessage(
         filament.id
           ? "Filament updated successfully."
           : "Filament created successfully."
       );
       handleClose(true);
-      setTimeout(() => setSuccessMessage(""), 5000);
     } else {
-      setErrorMessage(`Creation failed with message: ${response.statusText}`);
+      msgCtx.setErrorMessage(`Creation failed with message: ${response.statusText}`);
     }
     setIsLoading(false);
   };
@@ -150,14 +147,6 @@ const EditFilamentDrawer = (
   return (
     <>
       <LoadingDialog open={isLoading}/>
-      <MessageBanner
-        successMessage={successMessage}
-        errorMessage={errorMessage}
-        onClose={() => {
-          setErrorMessage("");
-          setSuccessMessage("");
-        }}
-      />
       <EditDrawer
         open={props.open}
         onClose={() => handleClose(false)}

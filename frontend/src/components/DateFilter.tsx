@@ -1,6 +1,7 @@
-import { Grid, Stack } from "@mui/material";
-import { DatePicker } from "@mui/x-date-pickers";
-import dayjs, { Dayjs } from "dayjs";
+import {Stack} from "@mui/material";
+import Grid from "@mui/material/Grid2";
+import {DatePicker} from "@mui/x-date-pickers";
+import dayjs, {Dayjs} from "dayjs";
 import React from "react";
 
 export const MAX_DATE = 9999999999999;
@@ -15,11 +16,11 @@ const DateFilter = (
 ) => {
   return (
     <>
-      <Grid item xs={6}>
+      <Grid size={{xs: 6}}>
         <Stack direction="row" display="flex" alignItems="center">
           From
           <DatePicker
-            sx={{ marginLeft: 2, marginRight: 2 }}
+            sx={{marginLeft: 2, marginRight: 2}}
             onChange={(v: Dayjs | null) =>
               props.onDatesChange &&
               props.onDatesChange(
@@ -28,7 +29,7 @@ const DateFilter = (
               )
             }
             slotProps={{
-              field: { clearable: true },
+              field: {clearable: true},
             }}
             value={props.minDate > MIN_DATE ? dayjs(props.minDate) : null}
             maxDate={
@@ -37,16 +38,16 @@ const DateFilter = (
           />
           to
           <DatePicker
-            sx={{ marginLeft: 2 }}
+            sx={{marginLeft: 2}}
             onChange={(v: Dayjs | null) => {
               props.onDatesChange &&
-                props.onDatesChange(
-                  props.minDate || MIN_DATE,
-                  v ? v.endOf("day").unix() * 1000 : MAX_DATE,
-                );
+              props.onDatesChange(
+                props.minDate || MIN_DATE,
+                v ? v.endOf("day").unix() * 1000 : MAX_DATE,
+              );
             }}
             slotProps={{
-              field: { clearable: true },
+              field: {clearable: true},
             }}
             value={props.maxDate < MAX_DATE ? dayjs(props.maxDate) : null}
             minDate={

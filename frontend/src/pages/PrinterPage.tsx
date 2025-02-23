@@ -1,11 +1,10 @@
 import IPrinter from "../models/IPrinter";
-import { DataGrid, GridActionsCellItem, GridColDef } from "@mui/x-data-grid";
-import { useState } from "react";
-import { Button, Stack, Tooltip } from "@mui/material";
+import {DataGrid, GridActionsCellItem, GridColDef} from "@mui/x-data-grid";
+import {useContext, useState} from "react";
+import {Button, Stack, Tooltip} from "@mui/material";
 import EditPrinterDrawer from "../components/drawers/EditPrinterDrawer";
-import LoadingDialog from "../components/LoadingDialog";
+import {LoadingDialog, MessageBannerContext} from "@eforge/eforge-common";
 import ConfirmationDialog from "../components/ConfirmationDialog";
-import MessageBanner from "../components/MessageBanner";
 import useAPIToken from "../hooks/use-api-token";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -14,18 +13,17 @@ import NoteAddIcon from "@mui/icons-material/NoteAdd";
 import AddPrintDrawer from "../components/drawers/EditPrintDrawer";
 import useFetch from "../hooks/use-fetch";
 
-const apiURL = `${process.env.REACT_APP_API_BASE_URL}printers`;
+const apiURL = `${import.meta.env.VITE_BASE_URL}printers`;
 
 const PrinterPage = () => {
-  const { data, refresh, isLoading } = useFetch<IPrinter[]>(apiURL);
+  const {data, refresh, isLoading} = useFetch<IPrinter[]>(apiURL);
   const [addAddEditrowId, setAddEditrowId] = useState("");
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [showLoadingDialog, setShowLoadingDialog] = useState(false);
-  const [successMessage, setSuccessMessage] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
   const bearerToken = useAPIToken();
   const [addPrintDrawerOpen, setAddPrintDrawerOpen] = useState(false);
+  const msgCtx = useContext(MessageBannerContext);
 
   const openDrawer = (id: string) => {
     setAddEditrowId(id);
@@ -37,14 +35,13 @@ const PrinterPage = () => {
     setShowLoadingDialog(true);
     const response = await fetch(`${apiURL}/${addAddEditrowId}`, {
       method: "DELETE",
-      headers: { Authorization: `Bearer ${bearerToken}` },
+      headers: {Authorization: `Bearer ${bearerToken}`},
     });
     if (response.ok) {
       await refresh();
-      setSuccessMessage("Printer successfully deleted.");
-      setTimeout(() => setSuccessMessage(""), 5000);
+      msgCtx.setSuccessMessage("Printer successfully deleted.");
     } else {
-      setErrorMessage("Error occurred deleting printer.");
+      msgCtx.setErrorMessage("Error occurred deleting printer.");
     }
     setShowLoadingDialog(false);
   };
@@ -55,35 +52,35 @@ const PrinterPage = () => {
   };
 
   const columns: GridColDef<IPrinter>[] = [
-    { field: "id", headerName: "ID", flex: 1 },
-    { field: "brand", headerName: "Brand", flex: 1 },
-    { field: "name", headerName: "Name", flex: 1 },
-    { field: "type", headerName: "Type", flex: 1 },
+    {field: "id", headerName: "ID", flex: 1},
+    {field: "brand", headerName: "Brand", flex: 1},
+    {field: "name", headerName: "Name", flex: 1},
+    {field: "type", headerName: "Type", flex: 1},
     {
       field: "actions",
       type: "actions",
       headerName: "Actions",
       cellClassName: "actions",
       width: 150,
-      getActions: ({ id }) => {
+      getActions: ({id}) => {
         return [
           <Tooltip title="Add Print" enterDelay={1000}>
             <GridActionsCellItem
-              icon={<NoteAddIcon />}
+              icon={<NoteAddIcon/>}
               label="Add Print"
               onClick={() => openAddPrintDrawer(id.toString())}
             />
           </Tooltip>,
           <Tooltip title="Edit" enterDelay={1000}>
             <GridActionsCellItem
-              icon={<EditIcon />}
+              icon={<EditIcon/>}
               label="Edit"
               onClick={() => openDrawer(id.toString())}
             />
           </Tooltip>,
           <Tooltip title="Delete" enterDelay={1000}>
             <GridActionsCellItem
-              icon={<DeleteIcon />}
+              icon={<DeleteIcon/>}
               label="Delete"
               onClick={() => {
                 setAddEditrowId(id.toString());
@@ -99,14 +96,6 @@ const PrinterPage = () => {
 
   return (
     <>
-      <MessageBanner
-        successMessage={successMessage}
-        errorMessage={errorMessage}
-        onClose={() => {
-          setSuccessMessage("");
-          setErrorMessage("");
-        }}
-      ></MessageBanner>
       <EditPrinterDrawer
         open={drawerOpen}
         onClose={async (updateOccurred) => {
@@ -148,7 +137,7 @@ const PrinterPage = () => {
       <LoadingDialog open={isLoading || showLoadingDialog}></LoadingDialog>
       <Stack direction="row" spacing={0.5} justifyContent="flex-end">
         <Button onClick={() => openDrawer("")}>
-          <AddIcon />
+          <AddIcon/>
         </Button>
       </Stack>
 
@@ -158,7 +147,7 @@ const PrinterPage = () => {
           columns={columns}
           initialState={{
             pagination: {
-              paginationModel: { page: 0, pageSize: 10 },
+              paginationModel: {page: 0, pageSize: 10},
             },
           }}
           pageSizeOptions={[10, 50, 100]}

@@ -2,7 +2,7 @@ import {useEffect, useState} from "react";
 import {useAuth0, User} from "@auth0/auth0-react";
 import useFetch from "./use-fetch";
 
-const apiUrl = `${process.env.REACT_APP_API_BASE_URL}user`;
+const apiUrl = `${import.meta.env.VITE_BASE_URL}user`;
 export type UserProfile = { isPublic?: boolean } & User;
 
 export const useUser = () => {

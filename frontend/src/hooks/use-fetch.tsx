@@ -58,9 +58,10 @@ function useFetch<T>(
           (!data || reload !== previousReload || url !== previousUrl) &&
           !isLoading
         ) {
-          fetchWithBearerToken();
-          setPreviousReload(reload);
-          setPreviousUrl(url);
+          fetchWithBearerToken().then(() => {
+            setPreviousReload(reload);
+            setPreviousUrl(url);
+          });
         }
       }
     }, [

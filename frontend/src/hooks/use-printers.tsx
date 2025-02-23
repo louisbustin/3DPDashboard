@@ -1,7 +1,7 @@
 import IPrinter from "../models/IPrinter";
 import useFetch from "./use-fetch";
 
-const apiURL = `${process.env.REACT_APP_API_BASE_URL}printers/`;
+const apiURL = `${import.meta.env.VITE_BASE_URL}printers/`;
 
 const usePrinters = () => {
   const p = useFetch<IPrinter[]>(apiURL);

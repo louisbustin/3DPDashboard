@@ -7,7 +7,7 @@ const ShrunkTextField = (props: TextFieldProps) => {
     <TextField
       {...props}
       InputLabelProps={{
-        shrink: props.value || props.value === 0 || shrink ? true : false,
+        shrink: !!(props.value || props.value === 0 || shrink),
       }}
       onFocus={() => setShrink(true)}
       onBlur={() => setShrink(false)}
